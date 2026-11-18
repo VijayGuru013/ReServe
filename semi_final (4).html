@@ -1,0 +1,1732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ReServe | Food Donation Portal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@400;600;700&family=Noto+Sans+Tamil:wght@400;600;700&family=Noto+Serif+Tamil:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+:root{
+  --bg:#fbfdf9;--ink:#292524;--muted:#57534e;--soft:#a8a29e;
+  --g95:#022c22;--g9:#064e3b;--g7:#047857;--g6:#059669;--g5:#ecfdf5;--g2:#a7f3d0;--g1:#d1fae5;
+  --o1:#ffedd5;--o2:#fed7aa;--o3:#fdba74;--o5:#fff7ed;--o8:#9a3412;--o9:#7c2d12;--err:#b91c1c;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 'Nunito','Noto Sans Tamil',system-ui,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+.head,h1,h2,h3{font-family:'Fraunces','Noto Serif Tamil',Georgia,serif}
+.wrap{max-width:72rem;margin:0 auto;padding:0 1.2rem}
+header.top{background:rgba(255,255,255,.85);border-bottom:1px solid rgba(6,78,59,.1)}
+.bar{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0}
+.logo{display:flex;align-items:center;gap:.65rem;text-decoration:none;color:var(--g9)}
+.logo i{display:grid;place-items:center;width:2.5rem;height:2.5rem;background:var(--g6);border-radius:1rem;transform:rotate(-3deg);font-style:normal}
+.logo b{display:block;font:700 1.5rem/1 'Fraunces','Noto Serif Tamil',Georgia,serif}
+.logo small{display:none;font-size:.78rem;color:var(--muted)}
+nav.main{display:none;gap:.25rem}
+nav.main a,.mnav a{padding:.5rem 1rem;border-radius:999px;font-weight:600;color:var(--muted);text-decoration:none;transition:background .2s,color .2s}
+nav.main a:hover,.mnav a:hover{background:var(--o1);color:var(--o8)}
+nav.main a.cur{background:var(--g1);color:var(--g9)}
+.burger{background:none;border:0;font-size:1.6rem;color:var(--g9);padding:.3rem .6rem;border-radius:.8rem;cursor:pointer}
+.mnav{display:none;flex-direction:column;gap:.2rem;padding-bottom:1rem}.mnav.open{display:flex}
+@media(min-width:640px){.logo small{display:block}}
+@media(min-width:768px){nav.main{display:flex}.burger,.mnav{display:none!important}}
+main{flex:1;width:100%}
+.view{display:none}.view.on{display:block}
+.hero{position:relative;padding:3rem 0 1.5rem}
+.pill{display:inline-flex;align-items:center;gap:.5rem;background:var(--o1);color:var(--o8);font-weight:700;font-size:.88rem;padding:.25rem .8rem;border-radius:999px;margin:0 0 .8rem}
+.hero h1{margin:0;font-size:clamp(2.2rem,7vw,3.8rem);line-height:1.1;color:var(--g95)}
+.hero p.lead{margin:1rem 0 0;max-width:36rem;font-size:1.1rem;color:var(--muted)}
+.doodle{display:none;position:absolute;right:1rem;top:2rem;width:14rem;pointer-events:none}
+@media(min-width:1024px){.doodle{display:block}}
+.sq{display:block;width:100%;height:1rem;margin-top:2rem}
+.sway{animation:sway 5s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.back{background:none;border:0;color:var(--g7);font:700 .95rem 'Nunito','Noto Sans Tamil',sans-serif;cursor:pointer;padding:.3rem 0;margin-top:1.5rem}
+.back:hover{text-decoration:underline}
+h2.sec{font-size:1.7rem;margin:0 0 .3rem;color:var(--g95)}
+.sub{color:var(--muted);margin:0 0 1.5rem}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:1.2rem;padding-bottom:3rem}
+.card{display:flex;flex-direction:column;align-items:center;text-align:center;gap:.6rem;width:100%;background:#fff;color:var(--ink);border:2px solid rgba(6,78,59,.12);border-top:6px solid var(--g6);border-radius:1.5rem;padding:2rem 1.2rem;cursor:pointer;font:inherit;transition:transform .25s ease,box-shadow .25s ease,border-color .25s ease}
+.card:hover,.card:focus-visible{transform:translateY(-6px);box-shadow:0 14px 28px rgba(6,95,70,.18);border-color:var(--o3)}
+.card:focus-visible{outline:3px solid var(--g2);outline-offset:2px}
+.card .ic{display:grid;place-items:center;width:4.2rem;height:4.2rem;border-radius:50%;background:var(--g1);font-size:1.9rem;transition:transform .25s ease,background .25s ease}
+.card:hover .ic{transform:scale(1.1) rotate(-6deg);background:var(--o2)}
+.card strong{font:700 1.4rem 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9)}
+.card .d{font-size:.95rem;color:var(--muted)}
+.layout{display:grid;gap:2rem;padding:1.5rem 0 4rem}
+.layout{max-width:44rem}
+form.big,.ok{background:#fff;border:1px solid rgba(6,78,59,.1);border-radius:2rem;padding:1.5rem;box-shadow:0 8px 30px -12px rgba(6,95,70,.25);height:fit-content}
+@media(min-width:640px){form.big,.ok{padding:2.2rem}}
+form.big>*+*{margin-top:1.8rem}
+.field label,legend.l{display:block;margin-bottom:.4rem;font-weight:700;color:var(--g95);padding:0}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+.req{color:var(--err)}.opt{font-weight:400;color:var(--soft)}
+input[type=text],input[type=tel],input[type=email],input[type=number],textarea,select{width:100%;font:1rem 'Nunito','Noto Sans Tamil',sans-serif;color:var(--ink);background:#fff;border:2px solid rgba(6,78,59,.15);border-radius:.8rem;padding:.75rem 1rem;transition:border-color .2s,box-shadow .2s}
+input::placeholder,textarea::placeholder{color:var(--soft)}
+input:focus,textarea:focus,select:focus{outline:0;border-color:var(--g6);box-shadow:0 0 0 4px var(--g1)}
+input[readonly]{background:var(--g5);font-weight:700;color:var(--g9)}
+textarea{min-height:6rem;resize:vertical}
+.row{display:flex;gap:.8rem;align-items:center}.row select{width:auto;font-weight:700}
+.hint{margin:.4rem 0 0;font-size:.88rem;color:var(--soft)}
+.err{display:none;margin:.4rem 0 0;font-size:.88rem;font-weight:700;color:var(--err)}
+.invalid>.err,.invalid .err.in{display:block}.invalid>input,.invalid>textarea,.invalid .row input{border-color:var(--err)}.invalid>.hint{display:none}
+.foods{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}
+@media(min-width:640px){.foods{grid-template-columns:repeat(3,1fr)}}
+.chip{cursor:pointer;display:block}
+.chip input,.opt2 input{position:absolute;opacity:0;pointer-events:none}
+.chip span{display:flex;align-items:center;gap:.5rem;height:100%;border:2px solid #e7e5e4;background:#fafaf9;border-radius:1rem;padding:.7rem .9rem;font-weight:700;color:#44403c;transition:all .2s}
+.chip:hover span{border-color:var(--o3);background:var(--o5)}
+.chip input:checked+span,.opt2 input:checked+span{border-color:var(--g6);background:var(--g5);color:var(--g9)}
+.chip input:focus-visible+span,.opt2 input:focus-visible+span{box-shadow:0 0 0 4px var(--g1)}
+.warn{display:flex;gap:.6rem;margin:.6rem 0 0;background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:.8rem;padding:.65rem .9rem;font-size:.9rem}
+.relief{background:rgba(255,247,237,.8);border:2px solid var(--o2);border-radius:1.5rem;padding:1.3rem}
+.relief h3{margin:0;font-size:1.25rem;color:var(--o9)}
+.relief p{margin:.4rem 0 0;color:#44403c}
+.relief .top2{display:flex;gap:.8rem;align-items:flex-start}
+.relief .ib{flex:none;display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;background:var(--o2)}
+.opts2{display:grid;gap:.7rem;margin-top:1rem}
+@media(min-width:640px){.opts2{grid-template-columns:1fr 1fr}}
+.opt2{cursor:pointer;display:block}
+.opt2 span{display:flex;align-items:center;gap:.5rem;height:100%;border:2px solid var(--o2);background:#fff;border-radius:1rem;padding:.75rem 1rem;font-weight:700;transition:all .2s}
+.opt2:hover span{border-color:#fb923c}
+.go{display:flex;width:100%;align-items:center;justify-content:center;gap:.6rem;border:0;border-radius:999px;background:var(--g6);color:#fff;font:700 1.1rem 'Nunito','Noto Sans Tamil',sans-serif;padding:1rem 2rem;cursor:pointer;box-shadow:0 10px 20px -8px rgba(5,150,105,.5);transition:transform .2s,background .2s}
+.go:hover{transform:translateY(-2px);background:var(--g7)}.go:focus-visible{outline:4px solid var(--g2);outline-offset:2px}
+.ok{text-align:center;border:2px solid var(--g2)}
+.ok .tick{display:grid;place-items:center;width:4rem;height:4rem;margin:0 auto;border-radius:50%;background:var(--g1);font-size:2rem;color:var(--g7)}
+.ok h2{margin:1.2rem 0 0;font-size:1.9rem;color:var(--g95)}.ok p{max-width:28rem;margin:.8rem auto 0;color:var(--muted)}
+.ok .again{margin-top:1.5rem;background:none;border:2px solid var(--g6);color:var(--g7);font:700 1rem 'Nunito','Noto Sans Tamil',sans-serif;border-radius:999px;padding:.6rem 1.5rem;cursor:pointer}.ok .again:hover{background:var(--g5)}
+aside.calc{height:fit-content}
+@media(min-width:1024px){aside.calc{position:sticky;top:1.5rem}}
+.impact{background:var(--g5);border:1px solid rgba(6,78,59,.1);border-radius:1.5rem;padding:1.5rem;box-shadow:0 6px 24px -12px rgba(6,95,70,.3)}
+.impact h3{margin:0;font-size:1.25rem;color:var(--g95)}
+.stat{display:flex;gap:.8rem;align-items:center;margin-top:1.2rem}
+.stat i{flex:none;display:grid;place-items:center;width:2.8rem;height:2.8rem;border-radius:1rem;font-style:normal;font-size:1.3rem}
+.stat b{font:700 1.6rem/1 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9)}.stat b small{font:700 .85rem 'Nunito','Noto Sans Tamil',sans-serif;color:rgba(6,78,59,.7);margin-left:.25rem}
+.stat span{display:block;font-size:.88rem;color:var(--muted);margin-top:.2rem}
+.fine{margin:1.2rem 0 0;font-size:.78rem;color:var(--soft)}
+.tipbox{margin:1.5rem 0 0;background:var(--o1);color:var(--o9);font-weight:700;font-size:.9rem;border-radius:1.5rem;padding:1rem 1.2rem}
+footer{background:#fff;border-top:1px solid rgba(6,78,59,.1);padding:2rem 0 calc(2rem + env(safe-area-inset-bottom,0px))}
+.fgrid{display:flex;flex-wrap:wrap;gap:1.2rem 2.5rem;justify-content:space-between;font-size:.92rem;color:var(--muted)}
+.fgrid p{margin:.1rem 0}.fgrid strong{font:700 1.2rem 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9)}
+footer a{color:var(--muted);font-weight:700;text-underline-offset:4px;margin-right:1rem}footer a:hover{color:var(--o8)}
+.toast{position:fixed;left:50%;bottom:1.2rem;z-index:50;transform:translateX(-50%);display:flex;gap:.8rem;align-items:flex-start;width:92%;max-width:28rem;background:var(--g9);color:#fff;border-radius:1rem;padding:1rem 1.2rem;box-shadow:0 12px 30px rgba(0,0,0,.3);font-size:.9rem;animation:pop .4s ease-out both}
+.toast[hidden]{display:none}.toast button{margin-left:auto;background:none;border:0;color:#a7f3d0;font-size:1.1rem;cursor:pointer}
+@keyframes pop{from{opacity:0;transform:translate(-50%,8px) scale(.98)}to{opacity:1;transform:translateX(-50%)}}
+
+/* NGO organisation verification */
+.rvgrp{border:2px solid rgba(6,78,59,.15);border-radius:1.2rem;padding:1.2rem;margin:0;min-width:0}
+.rvgrp legend{font-weight:700;padding:0 .4rem;color:var(--g7)}
+.rvgrp>*+*{margin-top:1.2rem}
+.rvgrp fieldset{border:0;padding:0;margin:0;min-width:0}
+.invalid>select{border-color:var(--err)}
+.drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.3rem;text-align:center;border:2px dashed rgba(6,78,59,.35);border-radius:1rem;padding:1.5rem 1rem;background:var(--g5);color:var(--g9);font-weight:700;cursor:pointer;transition:all .2s}
+.drop:hover,.drop.over{border-color:var(--g6);background:var(--g1)}
+.drop:focus-within{box-shadow:0 0 0 4px var(--g1)}
+.drop input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.invalid .drop{border-color:var(--err)}
+.fname{margin:.5rem 0 0;font-weight:700;color:var(--g7);word-break:break-all}.fname:empty{display:none}
+/* Donor notifications */
+nav.main a,.mnav a{position:relative}
+.ndot{position:absolute;top:.25rem;right:.3rem;width:.75rem;height:.75rem;border-radius:50%;background:#e53935;box-shadow:0 0 0 2px #fff}.ndot[hidden]{display:none}
+.mnav a .ndot{top:50%;right:auto;margin-left:.4rem;transform:translateY(-50%)}
+#dt-notes:not(:empty){margin:1rem 0}
+.nt-h{margin:0 0 .6rem;font-size:1.15rem;color:var(--g95)}
+.nt-card{background:var(--g5);border:2px solid var(--g6);border-radius:1.2rem;padding:1rem 1.2rem;margin-bottom:.7rem}
+.nt-card p{margin:.3rem 0}
+.nt-top{display:flex;gap:.6rem;align-items:center;color:var(--g9);font-size:1.05rem}
+.nt-new{background:#e53935;color:#fff;border-radius:999px;padding:.05rem .6rem;font-size:.75rem;font-weight:700}
+/* Donator verification */
+.vf fieldset.grp{border:2px solid rgba(6,78,59,.15);border-radius:1.2rem;padding:1.2rem}
+.vf legend{font-weight:700;padding:0 .4rem;color:var(--g7)}
+.vf .grp .field+.field{margin-top:1.2rem}
+.verr{color:var(--err);font-size:.88rem;font-weight:700;margin:.4rem 0 0}.verr:empty{display:none}
+.vf .invalid{border-color:var(--err)!important}
+.vbtn{background:#fff;color:var(--g7);border:2px solid var(--g6);border-radius:999px;font:700 1rem 'Nunito','Noto Sans Tamil',sans-serif;padding:.6rem 1.2rem;cursor:pointer}.vbtn:hover{background:var(--g5)}
+.vbtn:focus-visible{outline:4px solid var(--g2);outline-offset:2px}
+#preview{display:none;width:100%;max-height:260px;object-fit:cover;border-radius:1rem;border:1px solid rgba(6,78,59,.15);margin-top:.7rem}
+.okt{color:var(--g7);font-weight:700}
+.field label.chk{display:flex;gap:.7rem;align-items:flex-start;font-weight:400}.chk input{margin-top:.3rem;width:1.1rem;height:1.1rem;accent-color:var(--g6)}
+.status{display:inline-block;margin:.8rem 0 0;padding:.35rem 1rem;border-radius:999px;background:var(--o1);color:var(--o9);font-weight:700;font-size:.9rem}
+.ok .go{margin-top:1.5rem}
+
+/* Intro: a covered dish is served, the lid lifts, the name rises from the plate (10s) */
+.splash{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4rem;
+  background:radial-gradient(circle at 50% 40%,#ecfdf5 0%,#a7f3d0 100%);color:#064e3b;padding:1.5rem;text-align:center;
+  clip-path:circle(150% at 50% 42%);animation:iris-out .9s cubic-bezier(.65,0,.35,1) 10s forwards}
+.splash.leaving{animation:iris-out .8s cubic-bezier(.65,0,.35,1) forwards}
+@keyframes iris-out{from{clip-path:circle(150% at 50% 42%)}to{clip-path:circle(0% at 50% 42%)}}
+.dish{width:min(64vw,15rem);height:auto;overflow:visible}
+.plate{fill:none;stroke:#047857;stroke-width:3;stroke-linecap:round;stroke-dasharray:200;stroke-dashoffset:200;animation:draw 1.6s ease-out .2s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.lid{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:lid-in .8s ease-out .9s forwards,lid-off 1.6s cubic-bezier(.5,0,.2,1) 2.8s forwards}
+.lid *{fill:none;stroke:#047857;stroke-width:3;stroke-linecap:round}
+@keyframes lid-in{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes lid-off{to{transform:translate(46px,-64px) rotate(24deg);opacity:0}}
+.steam path{fill:none;stroke:#fb923c;stroke-width:3;stroke-linecap:round;stroke-dasharray:40;stroke-dashoffset:40;opacity:0;animation:steam 2.6s ease-in-out infinite}
+.steam path:nth-child(1){animation-delay:3.6s}.steam path:nth-child(2){animation-delay:4.1s}.steam path:nth-child(3){animation-delay:4.6s}
+@keyframes steam{0%{stroke-dashoffset:40;opacity:0;transform:translateY(8px)}30%{opacity:.9}100%{stroke-dashoffset:0;opacity:0;transform:translateY(-16px)}}
+.word{display:flex;justify-content:center;font:700 clamp(3.2rem,17vw,5.6rem)/1.1 'Fraunces','Noto Serif Tamil',Georgia,serif;margin:.2rem 0 0;color:#064e3b;text-shadow:0 3px 0 rgba(255,255,255,.7)}
+.word span{display:inline-block;opacity:0;transform:translateY(.9em) scaleY(.5);filter:blur(6px);
+  animation:rise .9s cubic-bezier(.2,.8,.2,1) calc(3.8s + var(--i)*.22s) forwards,glow 2.2s ease-in-out calc(7s + var(--i)*.1s) 1}
+@keyframes rise{to{opacity:1;transform:none;filter:none}}
+@keyframes glow{0%,100%{color:#064e3b}50%{color:#059669}}
+.tag{margin:.3rem 0 0;font:1.05rem/1.4 'Noto Sans Tamil',system-ui,sans-serif;color:#9a3412;font-weight:700;opacity:0;animation:fade-up 1s ease-out 6.2s forwards}
+@keyframes fade-up{from{opacity:0;transform:translateY(.8rem)}to{opacity:1;transform:none}}
+.skip{position:absolute;right:1rem;bottom:calc(1rem + env(safe-area-inset-bottom,0px));width:auto;padding:.5rem .9rem;font:.9rem 'Noto Sans Tamil',system-ui,sans-serif;background:rgba(255,255,255,.6);color:#064e3b;border:1.5px solid #047857;border-radius:999px;cursor:pointer}
+.splash.done{display:none}
+@media (prefers-reduced-motion:reduce){.plate,.steam path,.word span,.tag{animation:none;opacity:1;transform:none;filter:none;stroke-dashoffset:0}.lid{animation:none;opacity:0}.sway,.toast{animation:none}*{transition:none!important}}
+
+/* ===== Complete Leaflet 1.9.4 base styles (inlined so the map never depends on an external stylesheet) ===== */
+.leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden}
+.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;-moz-user-select:none;user-select:none;-webkit-user-drag:none}
+.leaflet-tile::selection{background:transparent}
+.leaflet-safari .leaflet-tile{image-rendering:-webkit-optimize-contrast}
+.leaflet-safari .leaflet-tile-container{width:1600px;height:1600px;-webkit-transform-origin:0 0}
+.leaflet-marker-icon,.leaflet-marker-shadow{display:block}
+.leaflet-container .leaflet-overlay-pane svg{max-width:none!important;max-height:none!important}
+.leaflet-container .leaflet-marker-pane img,.leaflet-container .leaflet-shadow-pane img,.leaflet-container .leaflet-tile-pane img,.leaflet-container img.leaflet-image-layer,.leaflet-container .leaflet-tile{max-width:none!important;max-height:none!important;width:auto;padding:0}
+.leaflet-container img.leaflet-tile{mix-blend-mode:plus-lighter}
+.leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}
+.leaflet-container.leaflet-touch-drag{touch-action:pinch-zoom}
+.leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
+.leaflet-container{-webkit-tap-highlight-color:transparent}
+.leaflet-container a{-webkit-tap-highlight-color:rgba(51,181,229,.4);color:#0078a8}
+.leaflet-tile{filter:inherit;visibility:hidden}
+.leaflet-tile-loaded{visibility:inherit}
+.leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800;border:2px dotted #38f;background:rgba(255,255,255,.5)}
+.leaflet-overlay-pane svg{-moz-user-select:none}
+.leaflet-pane{z-index:400}
+.leaflet-tile-pane{z-index:200}
+.leaflet-overlay-pane{z-index:400}
+.leaflet-shadow-pane{z-index:500}
+.leaflet-marker-pane{z-index:600}
+.leaflet-tooltip-pane{z-index:650}
+.leaflet-popup-pane{z-index:700}
+.leaflet-map-pane canvas{z-index:100}
+.leaflet-map-pane svg{z-index:200}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
+.leaflet-right .leaflet-control{float:right;margin-right:10px}
+.leaflet-top .leaflet-control{margin-top:10px}
+.leaflet-bottom .leaflet-control{margin-bottom:10px}
+.leaflet-left .leaflet-control{margin-left:10px}
+.leaflet-fade-anim .leaflet-popup{opacity:1;transition:opacity .2s linear}
+.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:0}
+.leaflet-zoom-animated{transform-origin:0 0}
+svg.leaflet-zoom-animated{will-change:transform}
+.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{transition:none}
+.leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}
+.leaflet-interactive{cursor:pointer}
+.leaflet-grab{cursor:grab}
+.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}
+.leaflet-popup-pane,.leaflet-control{cursor:auto}
+.leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:grabbing}
+.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
+.leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:auto}
+.leaflet-container{background:#e8f2ec;outline-offset:1px;font-family:'Nunito','Noto Sans Tamil',system-ui,sans-serif;font-size:.75rem;line-height:1.5}
+.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.65);border-radius:4px}
+.leaflet-bar a{background-color:#fff;border-bottom:1px solid #ccc;width:26px;height:26px;line-height:26px;display:block;text-align:center;text-decoration:none;color:#000}
+.leaflet-bar a:hover,.leaflet-bar a:focus{background-color:#f4f4f4}
+.leaflet-bar a:first-child{border-top-left-radius:4px;border-top-right-radius:4px}
+.leaflet-bar a:last-child{border-bottom-left-radius:4px;border-bottom-right-radius:4px;border-bottom:none}
+.leaflet-bar a.leaflet-disabled{cursor:default;background-color:#f4f4f4;color:#bbb}
+.leaflet-control-zoom-in,.leaflet-control-zoom-out{font:bold 18px 'Lucida Console',Monaco,monospace;text-indent:1px}
+.leaflet-control-scale-line{border:2px solid #777;border-top:none;line-height:1.1;padding:2px 5px 1px;white-space:nowrap;box-sizing:border-box;background:rgba(255,255,255,.8);text-shadow:1px 1px #fff;color:#333}
+.leaflet-control-scale-line:not(:first-child){border-top:2px solid #777;border-bottom:none;margin-top:-2px}
+.leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid #777}
+.leaflet-control-attribution{background:rgba(255,255,255,.8);margin:0;padding:0 5px;color:#333;line-height:1.4}
+.leaflet-control-attribution a{text-decoration:none}
+.leaflet-control-attribution a:hover,.leaflet-control-attribution a:focus{text-decoration:underline}
+.leaflet-attribution-flag{display:inline!important;vertical-align:baseline!important;width:1em;height:.6669em}
+.leaflet-left .leaflet-control-scale{margin-left:5px}
+.leaflet-bottom .leaflet-control-scale{margin-bottom:5px}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px}
+.leaflet-popup-content{margin:13px 24px 13px 20px;line-height:1.3;font-size:1.08333em;min-height:1px}
+.leaflet-popup-content p{margin:1.3em 0}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-top:-1px;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;pointer-events:auto;transform:rotate(45deg)}
+.leaflet-popup-content-wrapper,.leaflet-popup-tip{background:#fff;color:#333;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.leaflet-container a.leaflet-popup-close-button{position:absolute;top:0;right:0;border:none;text-align:center;width:24px;height:24px;font:16px/24px Tahoma,Verdana,sans-serif;color:#757575;text-decoration:none;background:transparent}
+.leaflet-container a.leaflet-popup-close-button:hover,.leaflet-container a.leaflet-popup-close-button:focus{color:#585858}
+.leaflet-tooltip{position:absolute;padding:6px;background-color:#fff;border:1px solid #fff;border-radius:3px;color:#222;white-space:nowrap;-webkit-user-select:none;user-select:none;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+/* ===== end Leaflet base styles ===== */
+.leaflet-pane,.leaflet-marker-icon,.leaflet-zoom-box,.leaflet-layer{position:absolute;left:0;top:0}
+.leaflet-container{overflow:hidden;position:relative;-webkit-tap-highlight-color:transparent;outline-offset:1px}
+.leaflet-pane{z-index:400}.leaflet-overlay-pane{z-index:400}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
+.leaflet-overlay-pane svg{position:absolute;left:0;top:0}
+.leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
+.leaflet-top{top:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}.leaflet-right{right:0}
+.leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
+.leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-left .leaflet-control{margin-left:10px}
+.leaflet-bar{box-shadow:0 1px 5px rgba(0,0,0,.4);border-radius:6px;overflow:hidden}
+.leaflet-bar a{display:block;width:34px;height:34px;line-height:34px;text-align:center;background:#fff;color:#1c2b24;text-decoration:none;border-bottom:1px solid #ccc;font:bold 20px/34px Arial}
+.leaflet-bar a:last-child{border-bottom:0}.leaflet-bar a:hover{background:var(--g5)}
+.leaflet-grab{cursor:grab}.leaflet-dragging .leaflet-grab{cursor:grabbing}
+.leaflet-interactive{cursor:pointer}
+.leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
+.leaflet-zoom-animated{transform-origin:0 0}
+.leaflet-popup{position:absolute;text-align:center;margin-bottom:20px}
+.leaflet-popup-content-wrapper{padding:1px;text-align:left;border-radius:12px;background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.leaflet-popup-content{margin:13px 22px 13px 16px;line-height:1.3;min-width:50px}
+.leaflet-popup-tip-container{width:40px;height:20px;position:absolute;left:50%;margin-left:-20px;overflow:hidden;pointer-events:none}
+.leaflet-popup-tip{width:17px;height:17px;padding:1px;margin:-10px auto 0;transform:rotate(45deg);background:#fff;box-shadow:0 3px 14px rgba(0,0,0,.4)}
+.leaflet-popup-close-button{position:absolute;top:0;right:0;padding:4px 8px;text-decoration:none;color:#757575;font:16px/24px Tahoma,Verdana}
+.leaflet-tooltip{position:absolute;padding:1px 6px;background:rgba(255,255,255,.88);border-radius:5px;color:#1c2b24;white-space:nowrap;font-size:.72rem;font-weight:600;pointer-events:none;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.leaflet-tooltip-bottom{margin-top:6px}
+/* Google-Maps-style map controls */
+.gpin{display:block;filter:drop-shadow(0 2px 2px rgba(0,0,0,.4))}
+.dir{display:inline-block;margin-top:8px;padding:5px 12px;border-radius:16px;background:#1a73e8;color:#fff;text-decoration:none;font-size:.82rem;font-weight:600}
+.leaflet-bar{border-radius:8px}
+.leaflet-bottom .leaflet-control{margin-bottom:22px}.leaflet-right .leaflet-control{margin-right:12px}
+.leaflet-popup-content-wrapper{border-radius:8px}
+.mapbox{position:relative;z-index:0;isolation:isolate;height:420px;border-radius:1.2rem;border:2px solid rgba(6,78,59,.15);background-color:#e8f2ec;background-image:linear-gradient(#d3e5da 1px,transparent 1px),linear-gradient(90deg,#d3e5da 1px,transparent 1px);background-size:48px 48px}
+.emerg{padding:0 0 4rem}.emerg h2{margin:0;font-size:clamp(1.6rem,4vw,2.1rem);color:var(--g95)}
+.emerg .mp{margin:.5rem 0 1.2rem;max-width:40rem;color:var(--muted)}
+.mgrid{display:grid;gap:1.5rem}@media(min-width:1024px){.mgrid{grid-template-columns:1.4fr 1fr;align-items:start}}
+.mleg{list-style:none;display:flex;flex-wrap:wrap;gap:.4rem 1.2rem;padding:0;margin:.8rem 0 0;font-size:.88rem;color:var(--muted)}
+.mleg i{display:inline-block;width:.8rem;height:.8rem;border-radius:50%;margin-right:.4rem;vertical-align:-1px}
+.popup h4{margin:0 0 .3rem;font:700 1.05rem 'Fraunces','Noto Serif Tamil',Georgia,serif}.popup table{border-collapse:collapse;font-size:.85rem}.popup td{padding:2px 8px 2px 0;vertical-align:top}.popup td:first-child{color:var(--muted)}
+.popup .pick{display:block;margin-top:.5rem;border:0;border-radius:999px;background:var(--g6);color:#fff;font:700 .85rem 'Nunito','Noto Sans Tamil',sans-serif;padding:.4rem 1rem;cursor:pointer}
+.selbar{display:flex;align-items:center;gap:.8rem;justify-content:space-between;margin:.8rem 0 0;padding:.6rem 1rem;border-radius:1rem;background:var(--g5);border:2px solid var(--g2);font-weight:700;color:var(--g9)}.selbar button{border:0;background:none;color:var(--o8);font:700 .9rem 'Nunito','Noto Sans Tamil',sans-serif;text-decoration:underline;cursor:pointer}
+.popup .badge{display:inline-block;padding:1px 8px;border-radius:999px;color:#fff;font-size:.75rem;font-weight:700;margin-bottom:.3rem}
+
+
+/* FoodLink-style map controls */
+.mapbox{height:min(78vh,620px);min-height:460px}
+.mapbox .leaflet-tooltip{font:700 .9rem/1.2 'Nunito','Noto Sans Tamil',sans-serif;color:#1c1917;padding:3px 9px;border:2px solid #fff;border-radius:8px;background:rgba(255,255,255,.96);box-shadow:0 2px 6px rgba(0,0,0,.35)}
+.mapbox .leaflet-bar a{width:42px;height:42px;line-height:42px;font-size:24px}
+.mapbox .leaflet-popup-content{font-size:1rem;min-width:200px}
+.mapbox .popup h4{font-size:1.2rem}
+.mapbox .popup table{font-size:.95rem}
+.mapbox .popup .pick{font-size:1rem;padding:.55rem 1.3rem}
+.mleg{font-size:1rem}.mleg i{width:1rem;height:1rem}
+.mchip{font-size:.95rem}.mdot{width:1rem;height:1rem}
+.selbar[hidden]{display:none}
+.mapgrid{display:grid;gap:1.2rem;padding:1rem 0 4rem}@media(min-width:960px){.mapgrid{grid-template-columns:19rem 1fr;align-items:start}}
+.mside{display:grid;gap:1rem}.mpanel{background:#fff;border:1px solid rgba(6,78,59,.12);border-radius:1.2rem;padding:1rem 1.1rem}.mpanel h3{margin:0 0 .6rem;font-size:1.1rem;color:var(--g95)}
+.mtools{display:flex;flex-wrap:wrap;gap:.5rem;margin:0 0 .7rem}
+.msearch{display:flex;gap:.5rem;margin:0 0 .6rem}
+.msearch input{flex:1}
+.mbtn{background:#fff;color:var(--g7);border:2px solid var(--g6);border-radius:999px;font:700 .9rem 'Nunito','Noto Sans Tamil',sans-serif;padding:.45rem 1rem;cursor:pointer}
+.mbtn:hover{background:var(--g5)}.mbtn.fill{background:var(--g6);color:#fff}.mbtn.fill:hover{background:var(--g7)}
+.mchips{display:flex;flex-wrap:wrap;gap:.45rem;margin:0 0 .7rem}
+.mchip{display:flex;align-items:center;gap:.4rem;padding:.35rem .8rem;border:2px solid #e7e5e4;border-radius:999px;background:#fff;font:700 .85rem 'Nunito','Noto Sans Tamil',sans-serif;color:#44403c;cursor:pointer}
+.mchip.on{background:var(--g5);border-color:var(--g6);color:var(--g9)}
+.mdot{width:.8rem;height:.8rem;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.mmsg{margin:.3rem 0 0;font-size:.85rem;color:var(--muted)}
+.mfb{position:absolute;left:10px;right:10px;top:10px;z-index:900;background:#fffbeb;border:1px solid #fcd34d;color:#78350f;border-radius:.6rem;padding:.5rem .8rem;font-size:.85rem}
+.mfb button{margin-left:.5rem;border:0;background:none;text-decoration:underline;font:inherit;cursor:pointer;color:inherit}
+.hide-labels .leaflet-tooltip{display:none}
+.gprog{position:sticky;top:0;z-index:30;background:rgba(251,253,249,.93);backdrop-filter:blur(6px);border-bottom:1px solid rgba(6,78,59,.1)}
+.gp{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0 .4rem;font-size:.85rem;font-weight:700;color:var(--g9)}
+.gpct{font-family:'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--o8)}
+.gtrack{position:relative;height:6px;background:var(--g1)}
+.gtrack i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--g6),var(--o3));border-radius:0 6px 6px 0;transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.gtrack::after{content:"";position:absolute;left:50%;top:-3px;width:12px;height:12px;border-radius:50%;background:#fff;border:2px solid var(--g6);transform:translateX(-50%);transition:background .3s}
+.gprog.half .gtrack::after{background:var(--g6)}
+.chips3{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0;margin:1rem 0 0}
+.chips3 li{background:var(--g1);color:var(--g9);font-weight:700;font-size:.88rem;border-radius:999px;padding:.35rem .9rem}
+.chips3 li.cur{background:#e0f2fe;color:#075985;box-shadow:0 0 0 2px #7dd3fc}
+.rqgrid{display:grid;gap:2rem;padding:1.5rem 0 4rem}@media(min-width:1024px){.rqgrid{grid-template-columns:1fr 340px}}
+.rqsteps{display:flex;flex-wrap:wrap;gap:.5rem}.rqsteps span{font-size:.85rem;font-weight:700;border-radius:999px;padding:.3rem .8rem;background:#f5f5f4;color:#78716c;transition:all .3s}
+.rqsteps span.done{background:var(--g1);color:var(--g9)}.rqsteps span.on{background:#e0f2fe;color:#075985;box-shadow:0 0 0 2px #7dd3fc}
+.rqpane{display:none}.rqpane.on{display:block;animation:rqs .35s ease-out both}.rqpane>*+*{margin-top:1.6rem}
+@keyframes rqs{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.dist4{display:grid;grid-template-columns:repeat(2,1fr);gap:.7rem}@media(min-width:640px){.dist4{grid-template-columns:repeat(4,1fr)}}
+.dist4 label{font-size:.88rem!important;font-weight:600!important;color:var(--muted)!important}
+.urgs{display:grid;gap:.7rem}@media(min-width:640px){.urgs{grid-template-columns:1fr 1fr}}
+.urgc{cursor:pointer;display:block}.urgc input{position:absolute;opacity:0;pointer-events:none}
+.urgc span{display:block;height:100%;border:2px solid;border-radius:1rem;padding:.8rem 1rem;transition:transform .2s,box-shadow .2s}
+.urgc b{display:block;font-size:1.05rem}.urgc small{display:block;opacity:.8;font-size:.88rem}
+.urgc.low span{background:#ecfdf5;border-color:#6ee7b7;color:#064e3b}.urgc.medium span{background:#fefce8;border-color:#fde047;color:#713f12}
+.urgc.high span{background:#fff7ed;border-color:#fdba74;color:#7c2d12}.urgc.emergency span{background:#fef2f2;border-color:#fca5a5;color:#7f1d1d}
+.urgc:hover span{transform:translateY(-2px)}.urgc input:checked+span{box-shadow:0 0 0 3px currentColor}.urgc input:focus-visible+span{box-shadow:0 0 0 4px var(--g1),0 0 0 6px currentColor}
+.emblue{background:#e0f2fe;border:2px solid #7dd3fc;border-radius:1.5rem;padding:1.3rem}.emblue h3{margin:0;color:#075985;font-size:1.25rem}.emblue p{margin:.4rem 0 1rem;color:#44403c}
+.rqnav{display:flex;justify-content:space-between;gap:.8rem;align-items:center}.rqnav .go{width:auto;flex:1;max-width:30rem}
+.rqbk{background:none;border:2px solid #d6d3d1;color:#44403c;border-radius:999px;font:700 1rem 'Nunito','Noto Sans Tamil',sans-serif;padding:.7rem 1.3rem;cursor:pointer}.rqbk:hover{background:#fff}
+.rqside .stat{align-items:flex-start}.rqside .stat b{font-size:1.05rem;line-height:1.3;word-break:break-word}
+.ok .btnrow{display:flex;flex-wrap:wrap;gap:.7rem;justify-content:center;margin-top:1.5rem}.ok .btnrow .again,.ok .btnrow .go{width:auto;margin:0}
+
+/* ===== NGO donation matching ===== */
+.match-summary{background:var(--g5);border:1px solid var(--g2);border-radius:1rem;padding:1rem 1.2rem;margin:.5rem 0 1.2rem;color:var(--g9);font-weight:700}
+.match-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(17rem,1fr));gap:1rem;padding-bottom:1.5rem}
+.match-card{background:#fff;border:1px solid rgba(6,78,59,.16);border-top:5px solid var(--g6);border-radius:1.2rem;padding:1.2rem;box-shadow:0 6px 20px -14px rgba(6,95,70,.35)}
+.match-card h3{margin:0 0 .5rem;color:var(--g95);font-size:1.25rem}
+.match-card p{margin:.35rem 0;color:var(--muted);font-size:.94rem}
+.match-card .match-qty{font:700 1.5rem 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9);margin:.6rem 0}
+.match-card button{margin-top:.8rem}
+.match-empty{background:#fff;border:2px dashed var(--o2);border-radius:1.2rem;padding:1.5rem;color:var(--muted)}
+.match-card .tagline{display:inline-block;background:var(--g1);color:var(--g9);border-radius:999px;padding:.2rem .7rem;font-size:.8rem;font-weight:700}
+.match-card .match-contact{overflow-wrap:anywhere}
+.match-toast{position:fixed;inset:0;z-index:200;background:rgba(20,30,25,.48);display:grid;place-items:center;padding:1rem}
+.match-toast[hidden]{display:none}
+.match-toast>div{max-width:30rem;width:100%;background:#fff;border-radius:1.3rem;padding:1.5rem;box-shadow:0 15px 50px rgba(0,0,0,.25)}
+.match-toast h3{margin:0 0 .6rem;color:var(--g95)}
+.match-toast p{color:var(--muted)}
+.match-toast button{width:100%;margin-top:.6rem}
+/* ===== Live truck trackers ===== */
+.trk{margin-top:1.8rem;text-align:left;border:2px solid var(--g2);border-radius:1.5rem;background:var(--g5);padding:1.1rem}
+.trk-h{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}.trk-h h3{margin:0;font-size:1.3rem;color:var(--g95)}
+.trk-live{font-size:.85rem;font-weight:700;color:var(--g7)}.trk-live i{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;background:#e53935;margin-right:.35rem;animation:trkp 1.2s infinite}
+@keyframes trkp{50%{opacity:.25}}
+.trk-sub{margin:.3rem 0 .8rem;color:var(--muted);font-size:.95rem}
+.trk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin:.8rem 0 0}
+.trk-stats div{background:#fff;border-radius:1rem;padding:.5rem .7rem}.trk-stats b{display:block;font:700 1.1rem 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9);line-height:1.25}.trk-stats span{font-size:.78rem;color:var(--muted)}
+.trk-map{height:360px;border-radius:1.2rem;border:2px solid #fff;margin-top:.8rem;position:relative;z-index:0;isolation:isolate;background:#e8f2ec}
+.trkTruck{width:44px;height:44px;line-height:40px;text-align:center;font-size:1.7rem;border-radius:50%;background:#fff;border:2px solid var(--o3);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.trk-id{font-size:.88rem;color:var(--muted);margin:.6rem 0 0}
+.trkpage .trk-map{height:min(68vh,540px);min-height:340px}
+.trkpage{padding-bottom:4rem}
+@media(max-width:480px){.trk-map{height:300px}.trk-stats b{font-size:.98rem}}
+
+/* ===== Language gate + switcher + Tamil typography ===== */
+.splash.wait,.splash.wait *{animation-play-state:paused!important}
+.langgate{position:fixed;inset:0;z-index:120;display:grid;place-items:center;padding:1.5rem;overflow:auto;
+  background:radial-gradient(circle at 50% 40%,#ecfdf5 0%,#a7f3d0 100%);color:var(--g95);
+  transition:opacity .55s ease,visibility .55s}
+.langgate.gone{opacity:0;visibility:hidden;pointer-events:none}
+.lg-in{width:100%;max-width:34rem;text-align:center}
+.lg-mark{display:inline-grid;place-items:center;width:3.4rem;height:3.4rem;background:var(--g6);border-radius:1.2rem;transform:rotate(-3deg);font-size:1.7rem}
+.lg-brand{display:block;margin-top:.7rem;font:700 1.9rem/1 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9)}
+.langgate h2{margin:1.8rem 0 0;font-size:1.7rem;line-height:1.25;color:var(--g95)}
+.langgate h2 span{display:block}
+.langgate h2 .lg-ta{margin-top:.35rem;font-size:1.35rem;color:var(--g9)}
+.lg-cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.8rem}
+@media(max-width:440px){.lg-cards{grid-template-columns:1fr}}
+.lg-cards .ic{font:700 2rem/1 'Fraunces','Noto Serif Tamil',Georgia,serif;color:var(--g9)}
+.rt{display:flex;align-items:center;gap:.4rem}
+.lang{display:inline-flex;border:2px solid rgba(6,78,59,.18);border-radius:999px;padding:2px;background:#fff}
+.lang button{border:0;background:none;border-radius:999px;padding:.25rem .8rem;min-height:2rem;font:700 .88rem 'Nunito','Noto Sans Tamil',sans-serif;color:var(--muted);cursor:pointer}
+.lang button:hover{color:var(--o8)}
+.lang button.on{background:var(--g1);color:var(--g9)}
+.lang button:focus-visible{outline:3px solid var(--g2);outline-offset:1px}
+html[lang=ta] body{line-height:1.75}
+html[lang=ta] h1,html[lang=ta] h2,html[lang=ta] h3{line-height:1.35}
+html[lang=ta] .hero h1{font-size:clamp(1.8rem,5.6vw,3rem)}
+html[lang=ta] nav.main a{padding:.5rem .7rem;font-size:.95rem}
+html[lang=ta] .logo small{font-size:.74rem;line-height:1.4}
+html[lang=ta] .go,html[lang=ta] .again,html[lang=ta] .rqbk{line-height:1.5}
+</style>
+</head>
+<body>
+<div class="langgate" id="langgate" role="dialog" aria-modal="true" aria-labelledby="lg-title">
+  <div class="lg-in">
+    <span class="lg-mark" aria-hidden="true">🍃</span>
+    <b class="lg-brand">ReServe</b>
+    <h2 id="lg-title"><span lang="en">Choose your language</span><span lang="ta" class="lg-ta">மொழியைத் தேர்ந்தெடுக்கவும்</span></h2>
+    <div class="lg-cards">
+      <button type="button" class="card" data-pick="en" lang="en"><span class="ic" aria-hidden="true">A</span><strong>English</strong><span class="d">Continue in English</span></button>
+      <button type="button" class="card" data-pick="ta" lang="ta"><span class="ic" aria-hidden="true">அ</span><strong>தமிழ்</strong><span class="d">தமிழில் தொடரவும்</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="splash wait" id="splash" role="img" aria-label="Re-Serve">
+  <svg class="dish" viewBox="0 0 200 120" aria-hidden="true">
+    <path class="plate" d="M10 108 H190"/>
+    <g class="steam"><path d="M80 78 C70 62 90 56 80 40"/><path d="M100 76 C90 58 112 52 100 34"/><path d="M120 78 C110 62 130 56 120 40"/></g>
+    <g class="lid"><path d="M30 104 C30 50 170 50 170 104 Z"/><circle cx="100" cy="62" r="5"/></g>
+  </svg>
+  <h2 class="word" aria-hidden="true"><span style="--i:0">R</span><span style="--i:1">e</span><span style="--i:2">-</span><span style="--i:3">S</span><span style="--i:4">e</span><span style="--i:5">r</span><span style="--i:6">v</span><span style="--i:7">e</span></h2>
+  <p class="tag">Leftover food, served again.</p>
+  <button type="button" class="skip" id="skip">Skip</button>
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <a href="#" class="logo" data-go="v-home"><i aria-hidden="true">🍃</i><span><b>ReServe</b><small>Reducing food waste, nourishing communities.</small></span></a>
+      <nav class="main" aria-label="Main">
+        <a href="#" class="cur" data-go="v-home">Home</a><a href="#" data-go="v-dtrack">Donor<span class="ndot" hidden role="img" aria-label="New notification"></span></a><a href="#" data-go="v-ngo">NGOs</a><a href="#" data-go="v-public">Available Donations</a><a href="#contact">About</a><a href="#contact">Contact</a>
+      </nav>
+      <div class="rt">
+        <div class="lang" role="group" aria-label="Language / மொழி"><button type="button" data-lang="en" aria-pressed="true" class="on" lang="en">English</button><button type="button" data-lang="ta" aria-pressed="false" lang="ta">தமிழ்</button></div>
+        <button class="burger" id="burger" aria-expanded="false" aria-label="Toggle menu">☰</button>
+      </div>
+    </div>
+    <nav class="mnav" id="mnav" aria-label="Mobile">
+      <a href="#" data-go="v-home">Home</a><a href="#" data-go="v-dtrack">Donor<span class="ndot" hidden role="img" aria-label="New notification"></span></a><a href="#" data-go="v-ngo">NGOs</a><a href="#" data-go="v-public">Available Donations</a><a href="#contact">About</a><a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+<div class="gprog" id="gprog" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Your progress through ReServe"><div class="wrap gp"><span id="gl">Welcome to ReServe</span><span class="gpct" id="gpct">0%</span></div><div class="gtrack"><i id="gfill"></i></div></div>
+
+<main>
+ <div class="wrap">
+  <!-- Landing -->
+  <section class="view on" id="v-home">
+    <div class="hero">
+      <p class="pill">🤝 Food Donation Portal</p>
+      <h1>Connecting Food Donators with Charities and NGOs</h1>
+      <p class="lead">Choose how you would like to take part.</p>
+    </div>
+    <div class="cards">
+      <button type="button" class="card" data-go="v-verify"><span class="ic" aria-hidden="true">🍲</span><strong>Food Donator</strong><span class="d">Have surplus food from an event? Request a pickup.</span></button>
+      <button type="button" class="card" data-go="v-ngo"><span class="ic" aria-hidden="true">🏠</span><strong>Charity / NGO</strong><span class="d">Register your organization to receive donated food.</span></button>
+    </div>
+  </section>
+
+  <!-- Donator verification -->
+  <section class="view" id="v-verify">
+    <button type="button" class="back" data-go="v-home">← Back</button>
+    <div class="hero" style="padding-top:1rem">
+      <p class="pill">🔒 Step 1 of 2</p>
+      <h2 class="sec">Donator Verification</h2>
+      <p class="sub" style="max-width:36rem">Only approved food businesses can list surplus food on ReServe. Please complete the details below so our team can review your application.</p>
+    </div>
+    <div style="max-width:36rem;padding-bottom:4rem">
+      <form class="big vf" id="verifyForm" novalidate>
+        <div class="field">
+          <label for="fssai">FSSAI Certificate Number <span class="req">*</span></label>
+          <input type="text" id="fssai" inputmode="numeric" maxlength="14" placeholder="14-digit licence / registration number" autocomplete="off">
+          <p class="hint">Used to identify your registered food business.</p>
+          <p class="verr" id="fssaiError"></p>
+        </div>
+        <fieldset class="grp">
+          <legend>Identity Verification</legend>
+          <div class="field">
+            <label for="idType">ID type <span class="req">*</span></label>
+            <select id="idType"><option value="">Select an ID type</option><option value="Aadhaar">Aadhaar</option><option value="PAN">PAN Card</option></select>
+            <p class="verr" id="idTypeError"></p>
+          </div>
+          <div class="field" id="idNumField" hidden>
+            <label for="idNum" id="idNumLabel">ID number</label>
+            <input type="text" id="idNum" autocomplete="off">
+            <p class="hint" id="idNumHint"></p>
+            <p class="verr" id="idNumError"></p>
+          </div>
+        </fieldset>
+        <fieldset class="grp">
+          <legend>Kitchen Photo and Location (optional)</legend>
+          <div class="field">
+            <label for="photo">Geotagged kitchen photograph</label>
+            <input type="file" id="photo" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="width:100%">
+            <p class="hint">JPG, JPEG or PNG, up to 5 MB. Turn on location tagging in your camera settings, then take a clear, recent photo of your kitchen or food preparation area. We use it to review kitchen cleanliness. Photos without location data are not accepted.</p>
+            <img id="preview" alt="Preview of the uploaded kitchen photo">
+            <p class="hint" id="photoGeo" aria-live="polite"></p>
+            <p class="verr" id="photoError"></p>
+          </div>
+          <div class="field">
+            <span class="l" style="display:block;font-weight:700;margin-bottom:.4rem;color:var(--g95)">Kitchen location</span>
+            <button type="button" class="vbtn" id="locBtn">Verify my kitchen location</button>
+            <p class="hint">Your browser will ask for permission. Please do this while you are at your kitchen.</p>
+            <div id="locationResult" aria-live="polite" style="font-size:.92rem"></div>
+            <p class="verr" id="locationError"></p>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label class="chk" for="agree"><input type="checkbox" id="agree"><span>I confirm that the details and photograph I have submitted are genuine. <span class="req">*</span></span></label>
+          <p class="verr" id="agreeError"></p>
+        </div>
+        <button type="submit" class="go">Submit for Verification</button>
+      </form>
+      <div class="ok" id="vSuccess" hidden role="status" aria-live="polite">
+        <span class="tick" aria-hidden="true">✔</span>
+        <h2>Your verification details have been submitted successfully!</h2>
+        <span class="status">Verification status: Pending Review</span>
+        <p>Our team will review your details. Next, add the details of the food you want to donate.</p>
+        <button type="button" class="go" data-go="v-donor">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Donator -->
+  <section class="view" id="v-donor">
+    <button type="button" class="back" data-go="v-home">← Back</button>
+    <div class="hero" style="padding-top:1rem">
+      <p class="pill">🤝 For event organizers</p>
+      <h1>Welcome Donator!</h1>
+      <p class="lead">Thank you for choosing to share your surplus food. Your contribution can help feed people in need and reduce food waste.</p>
+      <div class="doodle" aria-hidden="true">
+        <svg viewBox="0 0 220 170" fill="none" stroke-linecap="round" stroke-linejoin="round">
+          <ellipse cx="110" cy="150" rx="86" ry="9" fill="#d1fae5"/>
+          <path d="M40 98h140c0 30-30 48-70 48s-70-18-70-48Z" fill="#fff" stroke="#047857" stroke-width="3"/>
+          <path d="M62 98c4-22 20-34 48-34s44 12 48 34" fill="#fed7aa" stroke="#c2410c" stroke-width="3"/>
+          <g class="sway"><path d="M110 64c-2-18 4-32 18-42-2 16-6 30-18 42Z" fill="#34d399" stroke="#047857" stroke-width="3"/><path d="M110 64c-14-6-24-18-26-32 14 4 24 16 26 32Z" fill="#6ee7b7" stroke="#047857" stroke-width="3"/></g>
+          <circle cx="168" cy="52" r="9" fill="#fdba74" stroke="#c2410c" stroke-width="3"/>
+        </svg>
+      </div>
+      <svg class="sq" viewBox="0 0 600 16" fill="none" preserveAspectRatio="none" aria-hidden="true" style="color:#fdba74"><path d="M2 9c28-9 52 7 82-1s54-7 84 0 50 6 80-1 56-8 86 0 52 7 82 0 56-7 84 1 50 5 78-2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+
+    <div class="layout">
+      <div>
+        <form class="big" id="f-donor" novalidate>
+          <div class="field"><label for="d-name">Donator name <span class="req">*</span></label>
+            <input id="d-name" data-req type="text" autocomplete="name" placeholder="e.g. Priya Raman"><p class="err">Enter your name.</p></div>
+          <div class="field"><label for="d-addr">Pickup address <span class="req">*</span></label>
+            <textarea id="d-addr" data-req autocomplete="street-address" placeholder="Hall or building name, street, area, city, landmark"></textarea><p class="err">Enter the pickup address.</p></div>
+          <div class="field"><label for="d-phone">Contact number <span class="req">*</span></label>
+            <input id="d-phone" data-req data-phone type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 98765 43210"><p class="err">Enter a valid contact number.</p></div>
+          <div class="field"><label for="d-email">Email address <span class="opt">(optional)</span></label>
+            <input id="d-email" data-email type="email" autocomplete="email" placeholder="e.g. name@example.com"><p class="err">Enter a valid email address.</p></div>
+
+          <div class="field"><label for="ngo">NGO name <span class="opt">(optional)</span></label>
+            <input id="ngo" type="text" placeholder="Enter NGO name if you wish to donate to a specific organization">
+            <p class="hint">You may leave this blank and ReServe will connect your donation with the nearest verified NGO.</p></div>
+
+          <div class="field" id="g-map"><span class="l">Where is food needed most? <span class="opt">(optional)</span></span>
+            <p class="hint" style="margin:.2rem 0 .6rem">Tap a red or yellow pin to see how urgently food is needed there, then press “Send food here”.</p>
+            <div class="msearch"><input id="em-q" type="search" list="em-places" placeholder="Search an area, e.g. Peelamedu" aria-label="Search area"><datalist id="em-places"></datalist><button type="button" class="mbtn fill" id="em-go">Go</button></div>
+            <p class="mmsg" id="em-msg">Searches the sample areas.</p>
+            <div class="mchips" id="em-filters">
+              <button type="button" class="mchip on" data-f="high"><i class="mdot" style="background:#e53935"></i>Urgent need</button>
+              <button type="button" class="mchip on" data-f="medium"><i class="mdot" style="background:#f5c518"></i>Some need</button>
+              <button type="button" class="mchip on" data-f="donation"><i class="mdot" style="background:#2eaa5c"></i>Food available</button>
+              <button type="button" class="mchip on" data-f="ngo"><i class="mdot" style="background:#1e6fd9"></i>NGO centres</button>
+            </div>
+            <div class="mtools"><button type="button" class="mbtn" id="em-fit">Fit all markers</button><button type="button" class="mbtn" id="em-all">Show all</button></div>
+            <div id="em-map" class="mapbox" role="application" aria-label="Map of Coimbatore showing food need, available food and NGO centres"></div>
+            <ul class="mleg"><li><i style="background:#e53935"></i>Red: high food demand</li><li><i style="background:#f5c518"></i>Yellow: medium demand</li><li><i style="background:#2eaa5c"></i>Green: food donation available</li><li><i style="background:#1e6fd9"></i>Blue: NGO / distribution centre</li></ul>
+            <p class="selbar" id="em-sel" hidden><span id="em-sel-t"></span><button type="button" id="em-clear">Clear</button></p>
+            <p class="fine">Sample data for the prototype: every location and number shown is made up and not verified. Map tiles © Esri / OpenStreetMap contributors.</p></div>
+
+          <fieldset class="field" id="g-foods">
+            <legend class="l">Type of food available <span class="req">*</span></legend>
+            <div class="foods">
+              <label class="chip"><input type="checkbox" name="food" value="Vegetarian"><span><b aria-hidden="true">🥗</b> Vegetarian</span></label>
+              <label class="chip"><input type="checkbox" name="food" value="Non-Vegetarian"><span><b aria-hidden="true">🍗</b> Non-Vegetarian</span></label>
+              <label class="chip"><input type="checkbox" name="food" value="Sweets"><span><b aria-hidden="true">🍪</b> Sweets</span></label>
+              <label class="chip"><input type="checkbox" name="food" value="Bakery Items"><span><b aria-hidden="true">🥖</b> Bakery Items</span></label>
+              <label class="chip"><input type="checkbox" name="food" value="Beverages"><span><b aria-hidden="true">☕</b> Beverages</span></label>
+              <label class="chip"><input type="checkbox" name="food" value="Others"><span><b aria-hidden="true">📦</b> Others</span></label>
+            </div>
+            <p class="err">Pick at least one type of food.</p>
+          </fieldset>
+
+          <div class="field" id="g-qty"><label for="qty">Estimated quantity of food available <span class="req">*</span></label>
+            <div class="row"><input id="qty" type="number" min="0" inputmode="decimal" placeholder="Example: 50 meals, 25 kg, etc.">
+              <select id="unit" aria-label="Unit"><option value="meals">meals</option><option value="kg">kg</option></select></div>
+            <p class="hint">This amount is used to match your donation with NGO requirements. Choose meals or kg.</p><p class="err in">Enter a quantity greater than zero.</p></div>
+
+          <div class="field" id="g-prep"><label for="d-prep">Approx. time after preparation <span class="opt">(optional)</span></label>
+            <select id="d-prep"><option value="">Select approx. time</option><option value="Just prepared (under 1 hour)">Just prepared (under 1 hour)</option><option value="1–2 hours">1–2 hours</option><option value="2–4 hours">2–4 hours</option><option value="4–6 hours">4–6 hours</option><option value="6–8 hours">6–8 hours</option><option value="More than 8 hours">More than 8 hours</option></select>
+            <p class="hint">Roughly how long ago was this food prepared? NGOs use this to judge freshness.</p></div>
+
+          <fieldset class="field" id="g-all"><legend class="l">Allergens actually present in this food <span class="opt">(optional)</span></legend>
+            <div class="foods" id="d-allergen-options">
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Nuts"><span>🥜 Nuts</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Dairy"><span>🥛 Dairy</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Gluten"><span>🌾 Gluten</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Eggs"><span>🥚 Eggs</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Soy"><span>🫘 Soy</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Seafood"><span>🦐 Seafood</span></label>
+              <label class="chip"><input type="checkbox" name="d-allergen" value="Sesame"><span>Sesame</span></label>
+<label class="chip"><input type="checkbox" id="d-allergen-none" name="d-allergen-none" value="None"><span>✓ None of these</span></label>
+            </div>
+            <p class="hint">Select every allergen this food CONTAINS, or choose “None of these”. “None of these” is exclusive and clears the other allergen selections. An NGO avoiding an allergen will not see food containing that allergen.</p>
+            <p class="warn"><span aria-hidden="true">⚠️</span> Accurate allergen information helps keep recipients safe.</p></fieldset>
+
+          <fieldset class="relief" id="g-consent">
+            <legend class="sr" style="position:absolute;left:-9999px">Emergency Relief Permission</legend>
+            <div class="top2"><span class="ib" aria-hidden="true">ℹ️</span>
+              <div><h3>Emergency Relief Permission 🛟</h3>
+              <p>If a nearby emergency situation occurs (flood relief, disaster response, community crisis, etc.) and your selected NGO is unable to receive the food immediately, would you allow ReServe to redirect your donation to an emergency relief center?</p></div></div>
+            <div class="opts2">
+              <label class="opt2"><input type="radio" name="consent" value="yes"><span><b aria-hidden="true">✅</b> Yes, I give permission.</span></label>
+              <label class="opt2"><input type="radio" name="consent" value="no"><span><b aria-hidden="true">⭕</b> No, donate only to my selected NGO.</span></label>
+            </div>
+            <p class="err">Please choose one option.</p>
+          </fieldset>
+
+          <div class="field" id="g-spoilt"><label for="spoilt">Estimated spoilt food quantity <span class="opt">(optional)</span></label>
+            <div class="row"><input id="spoilt" type="number" min="0" inputmode="decimal" placeholder="Enter quantity that cannot be donated"><span id="u2" style="font-weight:700;color:var(--soft)">meals</span></div>
+            <p class="hint">This information helps us track food waste reduction and improve planning.</p><p class="err in">This can’t be negative or more than the quantity remaining.</p></div>
+
+          <div class="field"><label for="d-notes">Additional notes <span class="opt">(optional)</span></label>
+            <textarea id="d-notes" placeholder="Best pickup time, special instructions"></textarea></div>
+
+          <button class="go" type="submit"><span aria-hidden="true">➤</span> Submit Donation Request</button>
+        </form>
+
+        <div class="ok" id="ok-donor" hidden role="status" aria-live="polite">
+          <span class="tick" aria-hidden="true">✔</span>
+          <h2>Donation submitted</h2>
+          <p>Thank you for helping reduce food waste. Our team will coordinate with the appropriate NGO or relief center.</p><p id="ok-dest" hidden style="font-weight:700;color:var(--g7)"></p>
+          <p class="hint" style="text-align:center">Your donation is saved. Truck tracking will become available only after an NGO selects your donation.</p>
+          <div class="btnrow"><button type="button" class="go" data-go="v-dtrack">🔄 Check pickup status</button></div>
+          <button type="button" class="again" id="again">Donate more food</button>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- NGO -->
+  <section class="view" id="v-ngo">
+    <button type="button" class="back" data-go="v-home">← Back</button>
+    <div class="hero" style="padding-top:1rem">
+      <h2 class="sec">Charity / NGO registration</h2>
+      <p class="sub">Fields marked * are required.</p>
+    </div>
+    <div style="max-width:36rem;padding-bottom:4rem">
+      <form class="big" id="f-ngo" novalidate>
+        <div class="field"><label for="n-name">Organization name <span class="req">*</span></label>
+          <input id="n-name" data-req type="text" autocomplete="organization" placeholder="e.g. Annam Foundation"><p class="err">Enter the organization name.</p></div>
+        <div class="field"><label for="n-addr">Address <span class="req">*</span></label>
+          <textarea id="n-addr" data-req autocomplete="street-address" placeholder="Building, street, area"></textarea><p class="err">Enter the address.</p></div>
+        <div class="field"><label for="n-city">Location / city <span class="req">*</span></label>
+          <input id="n-city" data-req type="text" autocomplete="address-level2" placeholder="e.g. Salem"><p class="err">Enter the city or location.</p></div>
+        <div class="field"><label for="n-phone">Contact number <span class="req">*</span></label>
+          <input id="n-phone" data-req data-phone type="tel" inputmode="tel" autocomplete="tel" placeholder="e.g. 98765 43210"><p class="err">Enter a valid contact number.</p></div>
+        <div class="field"><label for="n-email">Email address <span class="opt">(optional)</span></label>
+          <input id="n-email" data-email type="email" autocomplete="email" placeholder="e.g. contact@yourngo.org"><p class="err">Enter a valid email address.</p></div>
+        <fieldset class="rvgrp">
+          <legend>Organisation verification</legend>
+          <fieldset>
+            <legend class="l">Organisation Category <span class="req">*</span></legend>
+            <p class="hint" style="margin:0 0 .6rem">Select the type of organisation</p>
+            <div class="foods">
+              <label class="chip"><input type="radio" name="n-cat" value="NGO / Charity" checked><span>🏠 NGO / Charity</span></label>
+              <label class="chip"><input type="radio" name="n-cat" value="Orphanage / Children’s Home"><span>🧒 Orphanage / Children’s Home</span></label>
+              <label class="chip"><input type="radio" name="n-cat" value="Old-age Home"><span>🧓 Old-age Home</span></label>
+            </div>
+          </fieldset>
+          <div class="field" id="n-regtype-f"><label for="n-regtype">Registration Type <span class="req">*</span></label>
+            <select id="n-regtype">
+              <option value="">Select Registration Type</option>
+              <option value="Trust Registration">Trust Registration</option>
+              <option value="Society Registration">Society Registration</option>
+              <option value="Section 8 Company CIN">Section 8 Company CIN</option>
+              <option value="JJ Act Section 41 CCI Registration">JJ Act Section 41 CCI Registration</option>
+              <option value="Old-age Home Registration Certificate">Old-age Home Registration Certificate</option>
+            </select><p class="err">Select the registration type.</p></div>
+          <div class="field"><label for="n-regno">Registration Number <span class="req">*</span></label>
+            <input id="n-regno" data-req type="text" autocomplete="off" placeholder="Enter official registration number"><p class="hint">Section 8 companies: enter the 21-character CIN.</p><p class="err">Enter the official registration number.</p></div>
+          <div class="field"><label for="n-auth">Issuing Authority <span class="req">*</span></label>
+            <input id="n-auth" data-req type="text" autocomplete="off" placeholder="Enter government department / authority"><p class="err">Enter the issuing authority.</p></div>
+          <div class="field" id="n-cert-f"><span class="l" style="display:block;margin-bottom:.4rem;font-weight:700;color:var(--g95)">Upload Official Registration Certificate <span class="req">*</span></span>
+            <p class="hint" style="margin:0 0 .6rem">PDF or Image (Max 5MB)</p>
+            <label class="drop" id="n-drop"><span aria-hidden="true" style="font-size:1.8rem">☁️</span><span>Click to upload or drag and drop</span>
+              <input type="file" id="n-cert" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"></label>
+            <p class="fname" id="n-fname" data-dyn aria-live="polite"></p>
+            <p class="err" id="n-certErr" data-dyn></p></div>
+        </fieldset>
+        <button class="go" type="submit">Register</button>
+      </form>
+      <div class="ok" id="ok-ngo" hidden role="status" aria-live="polite">
+        <span class="tick" aria-hidden="true">✔</span>
+        <h2>Registration successful</h2>
+        <p>Thank you for registering. Next, tell us what food your organization needs so donors can be matched accurately.</p>
+        <div class="btnrow"><button type="button" class="go" data-go="v-ngoreq">Continue to requirement details</button><button type="button" class="again" data-go="v-home">Back to home</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NGO requirement details -->
+  <section class="view" id="v-ngoreq">
+    <button type="button" class="back" data-go="v-home">← Back</button>
+    <div class="hero" style="padding-top:1rem">
+      <p class="pill">🥣 Charity / NGO · Step 2 of 2</p>
+      <h2 class="sec">NGO Food Requirement Details</h2>
+      <p class="sub" style="max-width:36rem;margin-bottom:0">Help us understand your needs so we can connect you with suitable food donations.</p>
+      <ol class="chips3"><li>✅ Account Registered</li><li>✅ Verification Submitted</li><li class="cur">🟢 Requirement Details</li></ol>
+      <div class="doodle" aria-hidden="true"><svg viewBox="0 0 280 170" fill="none" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="140" cy="158" rx="120" ry="8" fill="#cfe8dc"/><path d="M150 112h100v38a8 8 0 0 1-8 8h-84a8 8 0 0 1-8-8Z" fill="#dbeafe" stroke="#1e5a8a" stroke-width="3"/><path d="M144 112h112" stroke="#1e5a8a" stroke-width="3"/><circle cx="52" cy="58" r="16" fill="#fde7c8" stroke="#2d6a4f" stroke-width="3"/><path d="M26 150c0-30 10-68 26-68s26 38 26 68Z" fill="#86efac" stroke="#2d6a4f" stroke-width="3"/><path d="M78 112l36 6" stroke="#2d6a4f" stroke-width="4"/><rect x="108" y="108" width="26" height="18" rx="4" fill="#fff3d6" stroke="#b7791f" stroke-width="3"/><circle cx="112" cy="84" r="11" fill="#f5d3b0" stroke="#1e5a8a" stroke-width="3"/><path d="M96 150c0-20 6-44 16-44s16 24 16 44Z" fill="#93c5fd" stroke="#1e5a8a" stroke-width="3"/><circle cx="88" cy="100" r="9" fill="#fde7c8" stroke="#b7791f" stroke-width="3"/><path d="M76 150c0-14 4-32 12-32s12 18 12 32Z" fill="#fdba74" stroke="#b7791f" stroke-width="3"/><g class="sway"><path d="M178 96c-6-8 6-12 0-20M202 96c-6-8 6-12 0-20M226 96c-5-7 5-11 0-18" stroke="#7fb3d5" stroke-width="3"/></g></svg></div>
+    </div>
+    <div class="rqgrid">
+      <div>
+        <form class="big" id="f-req" novalidate>
+          <div class="rqsteps" id="rq-steps"><span>People &amp; meals</span><span>Food &amp; allergies</span><span>Safety &amp; storage</span><span>Urgency</span></div>
+
+          <div class="rqpane" data-s="0">
+            <div class="field" id="q-ppl"><label for="rq-ppl">How many people do you currently serve? <span class="req">*</span></label>
+              <input id="rq-ppl" type="number" min="1" inputmode="numeric" placeholder="Enter number of beneficiaries"><p class="hint">Example: 150</p><p class="err">Enter how many people you serve.</p></div>
+            <div class="field" id="q-meals"><label for="rq-meals">Food quantity required per day <span class="req">*</span></label>
+              <div class="row"><input id="rq-meals" type="number" min="1" inputmode="decimal" placeholder="Enter quantity needed daily"><select id="rq-unit" aria-label="Required quantity unit"><option value="meals">meals</option><option value="kg">kg</option></select></div>
+              <p class="hint">Select the same unit donors will use so quantities can be compared accurately.</p><p class="err">Enter a daily quantity greater than zero.</p></div>
+            <div class="field" id="q-dur"><label for="rq-dur">Food requirement duration <span class="req">*</span></label><select id="rq-dur"></select><p class="err">Choose how long you need food.</p></div>
+            <fieldset class="field" id="q-ages"><legend class="l">Which age groups will receive the food? <span class="req">*</span></legend><div class="foods" id="g-ages"></div><p class="err">Select at least one age group.</p></fieldset>
+            <div class="field" id="q-dist"><span class="l" style="display:block;font-weight:700;color:var(--g95);margin-bottom:.4rem">Approximate distribution <span class="opt">(optional)</span></span>
+              <div class="dist4"><div><label for="rq-dc">Children %</label><input id="rq-dc" type="number" min="0" max="100"></div><div><label for="rq-dt">Teenagers %</label><input id="rq-dt" type="number" min="0" max="100"></div><div><label for="rq-da">Adults %</label><input id="rq-da" type="number" min="0" max="100"></div><div><label for="rq-ds">Seniors %</label><input id="rq-ds" type="number" min="0" max="100"></div></div>
+              <p class="err"></p></div>
+          </div>
+
+          <div class="rqpane" data-s="1">
+            <fieldset class="field" id="q-foods"><legend class="l">What food categories can you accept? <span class="req">*</span></legend><div class="foods" id="rq-g-foods"></div><p class="err">Select at least one food category.</p></fieldset>
+            <fieldset class="field"><legend class="l">Allergens the NGO must AVOID <span class="opt">(optional)</span></legend><div class="foods" id="g-allergy"></div></fieldset>
+            <div class="field"><label for="rq-notes">Additional allergy notes</label><textarea id="rq-notes" placeholder="Provide any specific allergy information."></textarea></div>
+          </div>
+
+          <div class="rqpane" data-s="2">
+            <div class="field" id="q-prep"><label for="rq-prep">Preferred time after preparation</label><select id="rq-prep"></select>
+              <p class="hint">The longest time after cooking that your organization is comfortable accepting food.</p></div>
+            <fieldset class="field"><legend class="l">Packaging preference</legend><div class="foods" id="g-pack"></div></fieldset>
+            <fieldset class="field"><legend class="l">Cold storage available?</legend><div class="foods" id="g-cold"></div></fieldset>
+            <div class="field"><label for="rq-dry">Dry food storage capacity</label><select id="rq-dry"></select></div>
+          </div>
+
+          <div class="rqpane" data-s="3">
+            <fieldset class="field" id="q-urg"><legend class="l">Urgency level <span class="req">*</span></legend><div class="urgs" id="g-urg"></div><p class="err">Choose your current urgency level.</p></fieldset>
+            <div class="emblue"><h3>Emergency Redistribution Program 🛟</h3>
+              <p>If surplus food becomes available nearby during emergencies, ReServe can prioritize your organization for immediate delivery.</p>
+              <label class="chip"><input type="checkbox" id="rq-em"><span><b aria-hidden="true">✅</b> Our organization is willing to receive emergency food donations.</span></label></div>
+          </div>
+
+          <div class="rqnav"><button type="button" class="rqbk" id="rq-back">← Back</button><button type="button" class="go" id="rq-next">Next →</button></div>
+        </form>
+
+        <div class="ok" id="ok-req" hidden role="status" aria-live="polite">
+          <span class="tick" aria-hidden="true">✔</span>
+          <h2>✅ Requirements Saved Successfully</h2>
+          <p>Thank you for partnering with ReServe. Food donors can now view your requirements and suitable donations will be matched to your organization.</p>
+          <p class="hint">Your requirements are saved. Choose an eligible donor first; truck tracking will be enabled only for a selected donation.</p>
+          <div class="btnrow"><button type="button" class="go" data-go="v-match">🥗 View matching food donations</button></div>
+          <div class="btnrow"><button type="button" class="again" id="rq-upd">Update Requirements</button><button type="button" class="again" data-go="v-home">Return to Dashboard</button></div>
+          <p class="hint" id="rq-note"></p>
+        </div>
+      </div>
+
+      <aside class="calc rqside" aria-label="Requirement summary">
+        <div class="impact"><h3>🌱 Your Current Profile</h3>
+          <div aria-live="polite">
+            <div class="stat"><i style="background:var(--g2)" aria-hidden="true">👥</i><div><b id="rs-ppl">—</b><span>Beneficiaries served</span></div></div>
+            <div class="stat"><i style="background:#bae6fd" aria-hidden="true">🍽️</i><div><b id="rs-meals">—</b><span>Meals required</span></div></div>
+            <div class="stat"><i style="background:#fef08a" aria-hidden="true">🥖</i><div><b id="rs-foods">—</b><span>Accepted food categories</span></div></div>
+            <div class="stat"><i style="background:var(--o2)" aria-hidden="true">🧒</i><div><b id="rs-ages">—</b><span>Age groups</span></div></div>
+            <div class="stat"><i style="background:#fecdd3" aria-hidden="true">⚠️</i><div><b id="rs-allergy">—</b><span>Allergy restrictions</span></div></div>
+            <div class="stat"><i style="background:#fecaca" aria-hidden="true">🚦</i><div><b id="rs-urg">—</b><span>Urgency level</span></div></div>
+          </div>
+        </div>
+        <p class="tipbox">Together, we reduce waste and fight hunger.</p>
+      </aside>
+    </div>
+  </section>
+  <!-- Public read-only donations board: no registration and no dispatch controls -->
+  <section class="view" id="v-public">
+    <button type="button" class="back" data-go="v-home">← Back to home</button>
+    <div class="hero" style="padding:1rem 0 .5rem">
+      <p class="pill">🍲 Public donation board</p>
+      <h2 class="sec">Available food donations</h2>
+      <p class="sub">A live, read-only view of donations currently available. No sign-in is needed, and this page cannot dispatch a truck.</p>
+    </div>
+    <div class="match-summary" id="public-summary" aria-live="polite">Loading available donations…</div>
+    <div class="match-list" id="public-list" aria-live="polite"></div>
+    <p class="fine">This demo refreshes the board automatically when donations are submitted or allocated in this browser. Donor contact details and exact pickup addresses are kept off this public view.</p>
+    <div class="btnrow" style="display:flex;gap:.7rem;flex-wrap:wrap;padding-bottom:3rem">
+      <button type="button" class="again" data-go="v-home">Return to dashboard</button>
+    </div>
+  </section>
+
+  <!-- NGO matching page: shows only donations that satisfy food, allergen and quantity rules -->
+  <section class="view" id="v-match">
+    <button type="button" class="back" data-go="v-ngoreq">← Back to requirement confirmation</button>
+    <div class="hero" style="padding:1rem 0 .5rem">
+      <p class="pill">🥗 NGO donation matching</p>
+      <h2 class="sec">Food donations that meet your requirements</h2>
+      <p class="sub">Only donation centres that meet your food category, allergen and quantity requirements are shown.</p>
+    </div>
+    <div class="match-summary" id="match-summary" aria-live="polite"></div>
+    <div class="match-list" id="match-list" aria-live="polite"></div>
+    <p class="fine">Matching is a local demo using information saved in this browser only; it is not shared across devices. Confirm food safety and allergen labels at collection.</p>
+    <div class="btnrow" style="display:flex;gap:.7rem;flex-wrap:wrap;padding-bottom:3rem">
+      <button type="button" class="again" data-go="v-ngoreq">Back to requirements</button>
+      <button type="button" class="again" data-go="v-home">Return to dashboard</button>
+    </div>
+  </section>
+
+  <!-- Donor: status page; live tracking is gated until an NGO allocates this donation -->
+  <section class="view trkpage" id="v-dtrack">
+    <div class="hero" style="padding:1rem 0 .2rem">
+      <p class="pill">📍 Live tracker · For donors</p>
+      <h2 class="sec">Your pickup status</h2>
+      <p class="sub" style="margin-bottom:0">Tracking appears only after an NGO selects your donation.</p>
+    </div>
+    <div id="dt-notes" data-dyn aria-live="polite"></div>
+    <div id="dt-box"></div>
+    <button type="button" class="again" data-go="v-home" style="margin-top:1rem">Back to home</button>
+  </section>
+
+  <!-- NGO: live truck tracker page; reached only after selecting a donor -->
+  <section class="view trkpage" id="v-ntrack">
+    <div class="hero" style="padding:1rem 0 .2rem">
+      <p class="pill">📍 Live tracker · For charities / NGOs</p>
+      <h2 class="sec">A food truck is coming to you</h2>
+      <p class="sub" style="margin-bottom:0">Follow the truck carrying donated food to your organization.</p>
+    </div>
+    <div id="nr-box"></div>
+    <button type="button" class="again" data-go="v-home" style="margin-top:1rem">Back to home</button>
+  </section>
+ </div>
+</main>
+
+<footer id="contact">
+  <div class="wrap fgrid">
+    <p><strong>ReServe</strong><br>“Turning surplus into support.”<br>© 2026 ReServe. All rights reserved.</p>
+    <p>Email: contact@reserve.example<br>Phone: +91 00000 00000</p>
+    <p><a href="#">Privacy Policy</a><a href="#">Terms of Service</a><a href="#">Support</a><br><a href="#">Facebook</a><a href="#">Instagram</a><a href="#">X</a></p>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" hidden><span aria-hidden="true">✅</span><p style="margin:0">Thank you for helping reduce food waste. Our team will coordinate with the appropriate NGO or relief center.</p><button type="button" id="tx" aria-label="Dismiss">✕</button></div>
+<div class="match-toast" id="surplus-modal" hidden role="dialog" aria-modal="true" aria-labelledby="surplus-title">
+  <div><h3 id="surplus-title">Donation allocation confirmed</h3><p id="surplus-message"></p><button type="button" class="go" id="surplus-track">📍 Track this donation</button><button type="button" class="again" id="surplus-close">Continue matching</button></div>
+</div>
+<div class="match-toast" id="spoilt-modal" hidden role="dialog" aria-modal="true" aria-labelledby="spoilt-title">
+  <div>
+    <h3 id="spoilt-title">♻️ Food waste recovery</h3>
+    <p id="spoilt-message" aria-live="polite"></p>
+    <p>The entered quantity will be directed to fertilizer or biogas centres instead of being wasted.</p>
+    <button type="button" class="go" id="spoilt-close">Got it</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function(){
+  var $=function(i){return document.getElementById(i)};
+
+  /* ===== Language layer (English / Tamil) ===== */
+  var LANG='en',TA={"Approx. time after preparation":"தயாரித்த பிறகு சுமார் நேரம்","Select approx. time":"சுமார் நேரத்தைத் தேர்ந்தெடுக்கவும்","Just prepared (under 1 hour)":"இப்போதுதான் தயாரித்தது (1 மணி நேரத்துக்குள்)","1–2 hours":"1–2 மணி நேரம்","2–4 hours":"2–4 மணி நேரம்","4–6 hours":"4–6 மணி நேரம்","6–8 hours":"6–8 மணி நேரம்","More than 8 hours":"8 மணி நேரத்துக்கு மேல்","Roughly how long ago was this food prepared? NGOs use this to judge freshness.":"இந்த உணவு சுமார் எவ்வளவு நேரத்துக்கு முன் தயாரிக்கப்பட்டது? தொண்டு நிறுவனங்கள் புத்துணர்வை மதிப்பிட இதைப் பயன்படுத்தும்.","Preferred time after preparation":"தயாரித்த பிறகு விரும்பும் நேரம்","The longest time after cooking that your organization is comfortable accepting food.":"சமைத்த பிறகு உங்கள் அமைப்பு உணவை ஏற்கத் தயாராக உள்ள அதிகபட்ச நேரம்.","Within 2 hours":"2 மணி நேரத்துக்குள்","Within 4 hours":"4 மணி நேரத்துக்குள்","Within 6 hours":"6 மணி நேரத்துக்குள்","Within 8 hours":"8 மணி நேரத்துக்குள்","Within 12 hours":"12 மணி நேரத்துக்குள்","Within 24 hours":"24 மணி நேரத்துக்குள்","Notifications":"அறிவிப்புகள்","Order placed":"ஆர்டர் செய்யப்பட்டது","New":"புதியது","New notification":"புதிய அறிவிப்பு","{0} has placed an order for your donation.":"{0} உங்கள் நன்கொடைக்கு ஆர்டர் செய்துள்ளது.","Quantity ordered:":"ஆர்டர் செய்யப்பட்ட அளவு:","about {0} min":"சுமார் {0} நிமிடம்","Ordered at:":"ஆர்டர் நேரம்:","Live tracking for this order is shown below.":"இந்த ஆர்டருக்கான நேரடிக் கண்காணிப்பு கீழே காட்டப்படுகிறது.","Organisation verification":"அமைப்புச் சரிபார்ப்பு","Organisation Category":"அமைப்பு வகை","Select the type of organisation":"அமைப்பின் வகையைத் தேர்ந்தெடுக்கவும்","🏠 NGO / Charity":"🏠 தொண்டு நிறுவனம் / அறக்கட்டளை","🧒 Orphanage / Children’s Home":"🧒 ஆதரவற்றோர் இல்லம் / குழந்தைகள் இல்லம்","🧓 Old-age Home":"🧓 முதியோர் இல்லம்","Registration Type":"பதிவு வகை","Select Registration Type":"பதிவு வகையைத் தேர்ந்தெடுக்கவும்","Trust Registration":"அறக்கட்டளைப் பதிவு","Society Registration":"சங்கப் பதிவு","Section 8 Company CIN":"பிரிவு 8 நிறுவன CIN","JJ Act Section 41 CCI Registration":"சிறார் நீதிச் சட்டம் பிரிவு 41 CCI பதிவு","Old-age Home Registration Certificate":"முதியோர் இல்லப் பதிவுச் சான்றிதழ்","Select the registration type.":"பதிவு வகையைத் தேர்ந்தெடுக்கவும்.","Registration Number":"பதிவு எண்","Enter official registration number":"அதிகாரப்பூர்வ பதிவு எண்ணை உள்ளிடவும்","Section 8 companies: enter the 21-character CIN.":"பிரிவு 8 நிறுவனங்கள்: 21 எழுத்துகள் கொண்ட CIN-ஐ உள்ளிடவும்.","Enter the official registration number.":"அதிகாரப்பூர்வ பதிவு எண்ணை உள்ளிடவும்.","Issuing Authority":"வழங்கிய அதிகார அமைப்பு","Enter government department / authority":"அரசுத் துறை / அதிகார அமைப்பை உள்ளிடவும்","Enter the issuing authority.":"வழங்கிய அதிகார அமைப்பை உள்ளிடவும்.","Upload Official Registration Certificate":"அதிகாரப்பூர்வ பதிவுச் சான்றிதழைப் பதிவேற்றவும்","PDF or Image (Max 5MB)":"PDF அல்லது படம் (அதிகபட்சம் 5MB)","Click to upload or drag and drop":"பதிவேற்ற கிளிக் செய்யவும் அல்லது இழுத்து விடவும்","Upload your registration certificate.":"உங்கள் பதிவுச் சான்றிதழைப் பதிவேற்றவும்.","Upload a PDF, JPG or PNG file.":"PDF, JPG அல்லது PNG கோப்பைப் பதிவேற்றவும்.","The file is larger than 5 MB. Please choose a smaller one.":"கோப்பு 5 MB-ஐ விடப் பெரியது. சிறிய கோப்பைத் தேர்ந்தெடுக்கவும்.","ReServe | Food Donation Portal": "ReServe | உணவு நன்கொடை தளம்", "Leftover food, served again.": "மீதமுள்ள உணவு, மீண்டும் பரிமாறப்படுகிறது.", "Skip": "தவிர்", "Reducing food waste, nourishing communities.": "உணவு வீணாவதைக் குறைத்து, சமூகங்களுக்கு ஊட்டமளிக்கிறோம்.", "Main": "முதன்மை", "Home": "முகப்பு", "NGOs": "தொண்டு நிறுவனங்கள்", "Available Donations": "கிடைக்கும் நன்கொடைகள்", "About": "எங்களைப் பற்றி", "Contact": "தொடர்புக்கு", "Toggle menu": "பட்டியலைத் திற / மூடு", "Mobile": "மொபைல்", "Your progress through ReServe": "ReServe-இல் உங்கள் முன்னேற்றம்", "🤝 Food Donation Portal": "🤝 உணவு நன்கொடை தளம்", "Connecting Food Donators with Charities and NGOs": "உணவு நன்கொடையாளர்களை அறக்கட்டளைகளுடனும் தொண்டு நிறுவனங்களுடனும் இணைக்கிறோம்", "Choose how you would like to take part.": "நீங்கள் எவ்வாறு பங்கேற்க விரும்புகிறீர்கள் என்பதைத் தேர்ந்தெடுக்கவும்.", "Food Donator": "உணவு நன்கொடையாளர்", "Have surplus food from an event? Request a pickup.": "நிகழ்ச்சியில் உணவு மீதமாகிவிட்டதா? உணவைப் பெற்றுச் செல்லக் கோருங்கள்.", "Charity / NGO": "அறக்கட்டளை / தொண்டு நிறுவனம்", "Register your organization to receive donated food.": "நன்கொடை உணவைப் பெற உங்கள் அமைப்பைப் பதிவு செய்யுங்கள்.", "← Back": "← பின்செல்", "🔒 Step 1 of 2": "🔒 படி 1 / 2", "Donator Verification": "நன்கொடையாளர் சரிபார்ப்பு", "Only approved food businesses can list surplus food on ReServe. Please complete the details below so our team can review your application.": "அங்கீகரிக்கப்பட்ட உணவு வணிகங்கள் மட்டுமே ReServe-இல் மீதமுள்ள உணவைப் பட்டியலிட முடியும். எங்கள் குழு உங்கள் விண்ணப்பத்தை மதிப்பாய்வு செய்ய, கீழே உள்ள விவரங்களை நிரப்பவும்.", "FSSAI Certificate Number": "FSSAI சான்றிதழ் எண்", "14-digit licence / registration number": "14 இலக்க உரிம / பதிவு எண்", "Used to identify your registered food business.": "உங்கள் பதிவு செய்யப்பட்ட உணவு வணிகத்தை அடையாளம் காண இது பயன்படுகிறது.", "Identity Verification": "அடையாளச் சரிபார்ப்பு", "ID type": "அடையாள அட்டை வகை", "Select an ID type": "அடையாள அட்டை வகையைத் தேர்ந்தெடுக்கவும்", "Aadhaar": "ஆதார்", "PAN Card": "பான் கார்டு", "ID number": "அடையாள எண்", "Kitchen Photo and Location (optional)": "சமையலறைப் புகைப்படமும் இருப்பிடமும் (விருப்பத்திற்குரியது)", "Geotagged kitchen photograph": "இருப்பிடக் குறியுடன் கூடிய சமையலறைப் புகைப்படம்", "JPG, JPEG or PNG, up to 5 MB. Turn on location tagging in your camera settings, then take a clear, recent photo of your kitchen or food preparation area. We use it to review kitchen cleanliness. Photos without location data are not accepted.": "JPG, JPEG அல்லது PNG, அதிகபட்சம் 5 MB. உங்கள் கேமரா அமைப்புகளில் இருப்பிடக் குறியிடலை இயக்கி, சமையலறை அல்லது உணவு தயாரிக்கும் பகுதியின் தெளிவான, சமீபத்திய புகைப்படம் எடுக்கவும். சமையலறையின் தூய்மையை மதிப்பாய்வு செய்ய இதைப் பயன்படுத்துகிறோம். இருப்பிடத் தகவல் இல்லாத புகைப்படங்கள் ஏற்கப்படாது.", "Preview of the uploaded kitchen photo": "பதிவேற்றிய சமையலறைப் புகைப்படத்தின் முன்னோட்டம்", "Kitchen location": "சமையலறை இருப்பிடம்", "Verify my kitchen location": "என் சமையலறை இருப்பிடத்தைச் சரிபார்", "Your browser will ask for permission. Please do this while you are at your kitchen.": "உங்கள் உலாவி அனுமதி கேட்கும். நீங்கள் சமையலறையில் இருக்கும்போது இதைச் செய்யவும்.", "I confirm that the details and photograph I have submitted are genuine.": "நான் சமர்ப்பித்த விவரங்களும் புகைப்படமும் உண்மையானவை என உறுதிப்படுத்துகிறேன்.", "Submit for Verification": "சரிபார்ப்புக்குச் சமர்ப்பி", "Your verification details have been submitted successfully!": "உங்கள் சரிபார்ப்பு விவரங்கள் வெற்றிகரமாகச் சமர்ப்பிக்கப்பட்டன!", "Verification status: Pending Review": "சரிபார்ப்பு நிலை: மதிப்பாய்வுக்காகக் காத்திருக்கிறது", "Our team will review your details. Next, add the details of the food you want to donate.": "எங்கள் குழு உங்கள் விவரங்களை மதிப்பாய்வு செய்யும். அடுத்து, நீங்கள் நன்கொடையாக வழங்க விரும்பும் உணவின் விவரங்களைச் சேர்க்கவும்.", "Continue": "தொடரவும்", "Please upload a JPG, JPEG or PNG image.": "JPG, JPEG அல்லது PNG படத்தைப் பதிவேற்றவும்.", "The image is larger than 5 MB. Please choose a smaller one.": "படம் 5 MB-ஐ விடப் பெரியது. சிறிய படத்தைத் தேர்ந்தெடுக்கவும்.", "Checking the photo for location data...": "புகைப்படத்தில் இருப்பிடத் தகவல் உள்ளதா எனச் சரிபார்க்கப்படுகிறது...", "This photo has no location data. Turn on location tagging in your camera settings, take a new photo at your kitchen and upload it.": "இந்தப் புகைப்படத்தில் இருப்பிடத் தகவல் இல்லை. உங்கள் கேமரா அமைப்புகளில் இருப்பிடக் குறியிடலை இயக்கி, சமையலறையில் புதிய புகைப்படம் எடுத்துப் பதிவேற்றவும்.", "Geotag found in photo:": "புகைப்படத்தில் இருப்பிடக் குறி கண்டறியப்பட்டது:", "Your browser does not support location access.": "உங்கள் உலாவி இருப்பிட அணுகலை ஆதரிக்கவில்லை.", "Requesting your location...": "உங்கள் இருப்பிடம் கோரப்படுகிறது...", "Location captured.": "இருப்பிடம் பெறப்பட்டது.", "Latitude {0}, Longitude {1} (accuracy about {2} m)": "அட்சரேகை {0}, தீர்க்கரேகை {1} (துல்லியம் சுமார் {2} மீ)", "We could not get your location.": "உங்கள் இருப்பிடத்தைப் பெற முடியவில்லை.", "Location permission was denied. Please allow location access and try again.": "இருப்பிட அனுமதி மறுக்கப்பட்டது. இருப்பிட அணுகலை அனுமதித்து மீண்டும் முயலவும்.", "Your location is unavailable right now. Please try again.": "உங்கள் இருப்பிடம் இப்போது கிடைக்கவில்லை. மீண்டும் முயலவும்.", "Getting your location took too long. Please try again.": "இருப்பிடத்தைப் பெற அதிக நேரம் ஆனது. மீண்டும் முயலவும்.", "Aadhaar number": "ஆதார் எண்", "PAN card number": "பான் கார்டு எண்", "12 digits": "12 இலக்கங்கள்", "5 letters, 4 digits, 1 letter": "5 எழுத்துகள், 4 இலக்கங்கள், 1 எழுத்து", "Format: {0}": "வடிவம்: {0}", "Enter a valid 12-digit Aadhaar number.": "சரியான 12 இலக்க ஆதார் எண்ணை உள்ளிடவும்.", "Enter a valid PAN, e.g. ABCDE1234F.": "சரியான பான் எண்ணை உள்ளிடவும், எ.கா. ABCDE1234F.", "Enter your FSSAI certificate number.": "உங்கள் FSSAI சான்றிதழ் எண்ணை உள்ளிடவும்.", "The FSSAI number must be exactly 14 digits.": "FSSAI எண் சரியாக 14 இலக்கங்களாக இருக்க வேண்டும்.", "Select an ID type.": "அடையாள அட்டை வகையைத் தேர்ந்தெடுக்கவும்.", "The photo's location is about {0} km from your current location. Upload a photo taken at your kitchen.": "புகைப்படத்தின் இருப்பிடம் உங்கள் தற்போதைய இருப்பிடத்திலிருந்து சுமார் {0} கி.மீ. தொலைவில் உள்ளது. உங்கள் சமையலறையில் எடுத்த புகைப்படத்தைப் பதிவேற்றவும்.", "Please confirm the declaration.": "உறுதிமொழியை உறுதிப்படுத்தவும்.", "🤝 For event organizers": "🤝 நிகழ்ச்சி ஏற்பாட்டாளர்களுக்கு", "Welcome Donator!": "வரவேற்கிறோம், நன்கொடையாளரே!", "Thank you for choosing to share your surplus food. Your contribution can help feed people in need and reduce food waste.": "உங்கள் மீதமுள்ள உணவைப் பகிர்ந்துகொள்ள முன்வந்ததற்கு நன்றி. உங்கள் பங்களிப்பு தேவையுள்ளவர்களுக்கு உணவளிக்கவும் உணவு வீணாவதைக் குறைக்கவும் உதவும்.", "Donator name": "நன்கொடையாளர் பெயர்", "e.g. Priya Raman": "எ.கா. பிரியா ராமன்", "Enter your name.": "உங்கள் பெயரை உள்ளிடவும்.", "Pickup address": "உணவைப் பெறும் முகவரி", "Hall or building name, street, area, city, landmark": "மண்டபம் அல்லது கட்டிடத்தின் பெயர், தெரு, பகுதி, நகரம், அடையாளக் குறிப்பு", "Enter the pickup address.": "உணவைப் பெறும் முகவரியை உள்ளிடவும்.", "Contact number": "தொடர்பு எண்", "e.g. 98765 43210": "எ.கா. 98765 43210", "Enter a valid contact number.": "சரியான தொடர்பு எண்ணை உள்ளிடவும்.", "Email address": "மின்னஞ்சல் முகவரி", "(optional)": "(விருப்பத்திற்குரியது)", "e.g. name@example.com": "எ.கா. name@example.com", "Enter a valid email address.": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்.", "NGO name": "தொண்டு நிறுவனத்தின் பெயர்", "Enter NGO name if you wish to donate to a specific organization": "குறிப்பிட்ட அமைப்புக்கு நன்கொடை வழங்க விரும்பினால், அதன் பெயரை உள்ளிடவும்", "You may leave this blank and ReServe will connect your donation with the nearest verified NGO.": "இதை காலியாக விடலாம்; ReServe உங்கள் நன்கொடையை அருகிலுள்ள சரிபார்க்கப்பட்ட தொண்டு நிறுவனத்துடன் இணைக்கும்.", "Where is food needed most?": "எங்கு உணவு அதிகம் தேவைப்படுகிறது?", "Tap a red or yellow pin to see how urgently food is needed there, then press “Send food here”.": "சிவப்பு அல்லது மஞ்சள் குறியைத் தொட்டு, அங்கு உணவு எவ்வளவு அவசரமாகத் தேவை என்று பாருங்கள்; பின்னர் “உணவை இங்கே அனுப்பு” என்பதை அழுத்தவும்.", "Search an area, e.g. Peelamedu": "ஒரு பகுதியைத் தேடுங்கள், எ.கா. பீளமேடு", "Search area": "பகுதியைத் தேடு", "Go": "செல்", "Searches the sample areas.": "மாதிரிப் பகுதிகளில் தேடுகிறது.", "Urgent need": "அவசரத் தேவை", "Some need": "சிறிது தேவை", "Food available": "உணவு கிடைக்கும்", "NGO centres": "தொண்டு நிறுவன மையங்கள்", "Fit all markers": "அனைத்து குறிகளையும் காட்டு", "Show all": "அனைத்தையும் காட்டு", "Map of Coimbatore showing food need, available food and NGO centres": "உணவுத் தேவை, கிடைக்கும் உணவு, தொண்டு நிறுவன மையங்களைக் காட்டும் கோயம்புத்தூர் வரைபடம்", "Red: high food demand": "சிவப்பு: அதிக உணவுத் தேவை", "Yellow: medium demand": "மஞ்சள்: நடுத்தரத் தேவை", "Green: food donation available": "பச்சை: உணவு நன்கொடை கிடைக்கும்", "Blue: NGO / distribution centre": "நீலம்: தொண்டு நிறுவனம் / விநியோக மையம்", "Clear": "அழி", "Sample data for the prototype: every location and number shown is made up and not verified. Map tiles © Esri / OpenStreetMap contributors.": "முன்மாதிரிக்கான மாதிரித் தரவு: காட்டப்படும் அனைத்து இடங்களும் எண்களும் கற்பனையானவை; சரிபார்க்கப்படாதவை. வரைபடத் தளங்கள் © Esri / OpenStreetMap பங்களிப்பாளர்கள்.", "Type of food available": "கிடைக்கும் உணவு வகை", "Vegetarian": "சைவம்", "Non-Vegetarian": "அசைவம்", "Sweets": "இனிப்புகள்", "Bakery Items": "பேக்கரி பொருட்கள்", "Beverages": "பானங்கள்", "Others": "மற்றவை", "Pick at least one type of food.": "குறைந்தது ஒரு உணவு வகையைத் தேர்ந்தெடுக்கவும்.", "Estimated quantity of food available": "கிடைக்கும் உணவின் மதிப்பிடப்பட்ட அளவு", "Example: 50 meals, 25 kg, etc.": "எடுத்துக்காட்டு: 50 உணவுகள், 25 கி.கி. போன்றவை", "Unit": "அலகு", "meals": "உணவுகள்", "kg": "கி.கி.", "This amount is used to match your donation with NGO requirements. Choose meals or kg.": "தொண்டு நிறுவனங்களின் தேவைகளுடன் உங்கள் நன்கொடையைப் பொருத்த இந்த அளவு பயன்படுகிறது. உணவுகள் அல்லது கி.கி. என்பதைத் தேர்ந்தெடுக்கவும்.", "Enter a quantity greater than zero.": "பூஜ்ஜியத்தை விட அதிகமான அளவை உள்ளிடவும்.", "Allergens actually present in this food": "இந்த உணவில் உண்மையில் உள்ள ஒவ்வாமைப் பொருட்கள்", "🥜 Nuts": "🥜 கொட்டைகள்", "🥛 Dairy": "🥛 பால் பொருட்கள்", "🌾 Gluten": "🌾 குளூட்டன்", "🥚 Eggs": "🥚 முட்டை", "🫘 Soy": "🫘 சோயா", "🦐 Seafood": "🦐 கடல் உணவு", "Sesame": "எள்", "✓ None of these": "✓ இவை எதுவும் இல்லை", "Nuts": "கொட்டைகள்", "Dairy": "பால் பொருட்கள்", "Gluten": "குளூட்டன்", "Eggs": "முட்டை", "Soy": "சோயா", "Seafood": "கடல் உணவு", "None": "எதுவும் இல்லை", "Select every allergen this food CONTAINS, or choose “None of these”. “None of these” is exclusive and clears the other allergen selections. An NGO avoiding an allergen will not see food containing that allergen.": "இந்த உணவில் உள்ள ஒவ்வொரு ஒவ்வாமைப் பொருளையும் தேர்ந்தெடுக்கவும், அல்லது “இவை எதுவும் இல்லை” என்பதைத் தேர்ந்தெடுக்கவும். “இவை எதுவும் இல்லை” என்பது தனித்த தேர்வு; மற்ற ஒவ்வாமைத் தேர்வுகளை அது நீக்கிவிடும். ஒரு ஒவ்வாமைப் பொருளைத் தவிர்க்கும் தொண்டு நிறுவனத்துக்கு, அந்தப் பொருள் உள்ள உணவு காட்டப்படாது.", "Accurate allergen information helps keep recipients safe.": "துல்லியமான ஒவ்வாமைத் தகவல் உணவைப் பெறுபவர்களின் பாதுகாப்புக்கு உதவுகிறது.", "Emergency Relief Permission": "அவசரகால நிவாரண அனுமதி", "Emergency Relief Permission 🛟": "அவசரகால நிவாரண அனுமதி 🛟", "If a nearby emergency situation occurs (flood relief, disaster response, community crisis, etc.) and your selected NGO is unable to receive the food immediately, would you allow ReServe to redirect your donation to an emergency relief center?": "அருகில் அவசரநிலை (வெள்ள நிவாரணம், பேரிடர் மீட்பு, சமூகப் பேரிடர் போன்றவை) ஏற்பட்டு, நீங்கள் தேர்ந்தெடுத்த தொண்டு நிறுவனத்தால் உணவை உடனடியாகப் பெற முடியாவிட்டால், உங்கள் நன்கொடையை அவசரகால நிவாரண மையத்துக்குத் திருப்பிவிட ReServe-க்கு அனுமதி அளிப்பீர்களா?", "Yes, I give permission.": "ஆம், அனுமதி அளிக்கிறேன்.", "No, donate only to my selected NGO.": "இல்லை, நான் தேர்ந்தெடுத்த தொண்டு நிறுவனத்துக்கு மட்டுமே வழங்கவும்.", "Please choose one option.": "ஒரு விருப்பத்தைத் தேர்ந்தெடுக்கவும்.", "Estimated spoilt food quantity": "கெட்டுப்போன உணவின் மதிப்பிடப்பட்ட அளவு", "Enter quantity that cannot be donated": "நன்கொடையாக வழங்க முடியாத அளவை உள்ளிடவும்", "This information helps us track food waste reduction and improve planning.": "உணவு வீணாவதைக் குறைப்பதைக் கண்காணிக்கவும் திட்டமிடலை மேம்படுத்தவும் இந்தத் தகவல் உதவுகிறது.", "This can’t be negative or more than the quantity remaining.": "இது எதிர்மறையாகவோ மீதமுள்ள அளவை விட அதிகமாகவோ இருக்கக் கூடாது.", "Additional notes": "கூடுதல் குறிப்புகள்", "Best pickup time, special instructions": "உணவைப் பெற ஏற்ற நேரம், சிறப்பு அறிவுறுத்தல்கள்", "Submit Donation Request": "நன்கொடைக் கோரிக்கையைச் சமர்ப்பி", "Donation submitted": "நன்கொடை சமர்ப்பிக்கப்பட்டது", "Thank you for helping reduce food waste. Our team will coordinate with the appropriate NGO or relief center.": "உணவு வீணாவதைக் குறைக்க உதவியதற்கு நன்றி. எங்கள் குழு தகுந்த தொண்டு நிறுவனம் அல்லது நிவாரண மையத்துடன் ஒருங்கிணைக்கும்.", "Your donation is saved. Truck tracking will become available only after an NGO selects your donation.": "உங்கள் நன்கொடை சேமிக்கப்பட்டது. ஒரு தொண்டு நிறுவனம் உங்கள் நன்கொடையைத் தேர்ந்தெடுத்த பிறகே லாரி கண்காணிப்பு கிடைக்கும்.", "🔄 Check pickup status": "🔄 உணவு பெறும் நிலையைப் பார்", "Donate more food": "மேலும் உணவு வழங்கு", "{0} {1} of spoilt food will be sent to fertilizer / biogas centres.": "கெட்டுப்போன {0} {1} உணவு உரம் / உயிரிவாயு மையங்களுக்கு அனுப்பப்படும்.", "Your food is also marked for: {0}.": "உங்கள் உணவு {0} என்ற இடத்துக்கும் குறிக்கப்பட்டுள்ளது.", "Charity / NGO registration": "அறக்கட்டளை / தொண்டு நிறுவனப் பதிவு", "Fields marked * are required.": "* குறியிடப்பட்ட புலங்கள் கட்டாயம்.", "Organization name": "அமைப்பின் பெயர்", "e.g. Annam Foundation": "எ.கா. அன்னம் அறக்கட்டளை", "Enter the organization name.": "அமைப்பின் பெயரை உள்ளிடவும்.", "Address": "முகவரி", "Building, street, area": "கட்டிடம், தெரு, பகுதி", "Enter the address.": "முகவரியை உள்ளிடவும்.", "Location / city": "இடம் / நகரம்", "e.g. Salem": "எ.கா. சேலம்", "Enter the city or location.": "நகரம் அல்லது இடத்தை உள்ளிடவும்.", "e.g. contact@yourngo.org": "எ.கா. contact@yourngo.org", "Register": "பதிவு செய்", "Registration successful": "பதிவு வெற்றிகரமாக முடிந்தது", "Thank you for registering. Next, tell us what food your organization needs so donors can be matched accurately.": "பதிவு செய்ததற்கு நன்றி. அடுத்து, நன்கொடையாளர்களைத் துல்லியமாகப் பொருத்த உங்கள் அமைப்புக்கு எந்த உணவு தேவை என்பதைத் தெரிவிக்கவும்.", "Continue to requirement details": "தேவை விவரங்களுக்குத் தொடரவும்", "Back to home": "முகப்புக்குத் திரும்பு", "🥣 Charity / NGO · Step 2 of 2": "🥣 அறக்கட்டளை / தொண்டு நிறுவனம் · படி 2 / 2", "NGO Food Requirement Details": "தொண்டு நிறுவனத்தின் உணவுத் தேவை விவரங்கள்", "Help us understand your needs so we can connect you with suitable food donations.": "உங்கள் தேவைகளைப் புரிந்துகொள்ள உதவுங்கள்; அப்போது பொருத்தமான உணவு நன்கொடைகளுடன் உங்களை இணைக்க முடியும்.", "✅ Account Registered": "✅ கணக்கு பதிவு செய்யப்பட்டது", "✅ Verification Submitted": "✅ சரிபார்ப்பு சமர்ப்பிக்கப்பட்டது", "🟢 Requirement Details": "🟢 தேவை விவரங்கள்", "People & meals": "மக்களும் உணவும்", "Food & allergies": "உணவும் ஒவ்வாமையும்", "Safety & storage": "பாதுகாப்பும் சேமிப்பும்", "Urgency": "அவசரநிலை", "How many people do you currently serve?": "தற்போது எத்தனை பேருக்கு உணவளிக்கிறீர்கள்?", "Enter number of beneficiaries": "பயனாளிகளின் எண்ணிக்கையை உள்ளிடவும்", "Example: 150": "எடுத்துக்காட்டு: 150", "Enter how many people you serve.": "எத்தனை பேருக்கு உணவளிக்கிறீர்கள் என்பதை உள்ளிடவும்.", "Food quantity required per day": "ஒரு நாளுக்குத் தேவையான உணவின் அளவு", "Enter quantity needed daily": "தினமும் தேவையான அளவை உள்ளிடவும்", "Required quantity unit": "தேவையான அளவின் அலகு", "Select the same unit donors will use so quantities can be compared accurately.": "அளவுகளைத் துல்லியமாக ஒப்பிட, நன்கொடையாளர்கள் பயன்படுத்தும் அதே அலகைத் தேர்ந்தெடுக்கவும்.", "Enter a daily quantity greater than zero.": "பூஜ்ஜியத்தை விட அதிகமான தினசரி அளவை உள்ளிடவும்.", "Food requirement duration": "உணவுத் தேவையின் கால அளவு", "Choose how long you need food.": "எவ்வளவு காலம் உணவு தேவை என்பதைத் தேர்ந்தெடுக்கவும்.", "Which age groups will receive the food?": "எந்த வயதினர் இந்த உணவைப் பெறுவார்கள்?", "Select at least one age group.": "குறைந்தது ஒரு வயதுப் பிரிவைத் தேர்ந்தெடுக்கவும்.", "Approximate distribution": "தோராயப் பங்கீடு", "Children %": "குழந்தைகள் %", "Teenagers %": "இளம் பருவத்தினர் %", "Adults %": "பெரியவர்கள் %", "Seniors %": "முதியோர் %", "What food categories can you accept?": "எந்த உணவு வகைகளை ஏற்றுக்கொள்ள முடியும்?", "Select at least one food category.": "குறைந்தது ஒரு உணவு வகையைத் தேர்ந்தெடுக்கவும்.", "Allergens the NGO must AVOID": "தொண்டு நிறுவனம் தவிர்க்க வேண்டிய ஒவ்வாமைப் பொருட்கள்", "Additional allergy notes": "கூடுதல் ஒவ்வாமைக் குறிப்புகள்", "Provide any specific allergy information.": "குறிப்பிட்ட ஒவ்வாமைத் தகவல் இருந்தால் தெரிவிக்கவும்.", "Maximum food age accepted": "தயாரித்த பிறகு ஏற்கக்கூடிய அதிகபட்ச நேரம்", "Packaging preference": "பொட்டலமிடும் முறை விருப்பம்", "Cold storage available?": "குளிர்ப் பதன வசதி உள்ளதா?", "Dry food storage capacity": "உலர் உணவு சேமிப்புத் திறன்", "Urgency level": "அவசரநிலை அளவு", "Choose your current urgency level.": "உங்கள் தற்போதைய அவசர நிலையைத் தேர்ந்தெடுக்கவும்.", "Emergency Redistribution Program 🛟": "அவசரகால மறுவிநியோகத் திட்டம் 🛟", "If surplus food becomes available nearby during emergencies, ReServe can prioritize your organization for immediate delivery.": "அவசரநிலைகளின் போது அருகில் மீதமுள்ள உணவு கிடைத்தால், உடனடி விநியோகத்துக்கு ReServe உங்கள் அமைப்புக்கு முன்னுரிமை அளிக்கும்.", "Our organization is willing to receive emergency food donations.": "அவசரகால உணவு நன்கொடைகளைப் பெற எங்கள் அமைப்பு தயாராக உள்ளது.", "Next →": "அடுத்து →", "Save Requirements & Start Receiving Donations": "தேவைகளைச் சேமித்து நன்கொடைகளைப் பெறத் தொடங்கு", "✅ Requirements Saved Successfully": "✅ தேவைகள் வெற்றிகரமாகச் சேமிக்கப்பட்டன", "Thank you for partnering with ReServe. Food donors can now view your requirements and suitable donations will be matched to your organization.": "ReServe-உடன் இணைந்ததற்கு நன்றி. உணவு நன்கொடையாளர்கள் இப்போது உங்கள் தேவைகளைப் பார்க்கலாம்; பொருத்தமான நன்கொடைகள் உங்கள் அமைப்புடன் இணைக்கப்படும்.", "Your requirements are saved. Choose an eligible donor first; truck tracking will be enabled only for a selected donation.": "உங்கள் தேவைகள் சேமிக்கப்பட்டன. முதலில் தகுதியுள்ள நன்கொடையாளரைத் தேர்ந்தெடுக்கவும்; தேர்ந்தெடுத்த நன்கொடைக்கு மட்டுமே லாரி கண்காணிப்பு இயக்கப்படும்.", "🥗 View matching food donations": "🥗 பொருந்தும் உணவு நன்கொடைகளைப் பார்", "Update Requirements": "தேவைகளைப் புதுப்பி", "Return to Dashboard": "முகப்புப் பக்கத்துக்குத் திரும்பு", "Requirement summary": "தேவைச் சுருக்கம்", "🌱 Your Current Profile": "🌱 உங்கள் தற்போதைய விவரம்", "Beneficiaries served": "உணவளிக்கப்படும் பயனாளிகள்", "Meals required": "தேவையான உணவுகள்", "Accepted food categories": "ஏற்கும் உணவு வகைகள்", "Age groups": "வயதுப் பிரிவுகள்", "Allergy restrictions": "ஒவ்வாமைக் கட்டுப்பாடுகள்", "Together, we reduce waste and fight hunger.": "ஒன்றிணைந்து, வீணாவதைக் குறைத்து பசியை எதிர்த்துப் போராடுவோம்.", "Select duration": "கால அளவைத் தேர்ந்தெடுக்கவும்", "Today Only": "இன்று மட்டும்", "1 Week": "1 வாரம்", "2 Weeks": "2 வாரங்கள்", "1 Month": "1 மாதம்", "Ongoing Requirement": "தொடர்ந்து தேவை", "Select a time limit": "நேர வரம்பைத் தேர்ந்தெடுக்கவும்", "Prepared within 4 hours": "4 மணி நேரத்துக்குள் தயாரித்தது", "Prepared within 8 hours": "8 மணி நேரத்துக்குள் தயாரித்தது", "Prepared within 12 hours": "12 மணி நேரத்துக்குள் தயாரித்தது", "Prepared within 24 hours": "24 மணி நேரத்துக்குள் தயாரித்தது", "Select capacity": "திறனைத் தேர்ந்தெடுக்கவும்", "Less than 50 meals": "50 உணவுகளுக்கும் குறைவு", "50–100 meals": "50–100 உணவுகள்", "100–250 meals": "100–250 உணவுகள்", "250+ meals": "250+ உணவுகள்", "Children (0-12 years)": "குழந்தைகள் (0-12 வயது)", "Teenagers (13-17 years)": "இளம் பருவத்தினர் (13-17 வயது)", "Adults (18-59 years)": "பெரியவர்கள் (18-59 வயது)", "Senior Citizens (60+ years)": "முதியோர் (60+ வயது)", "Mixed Community": "கலப்புச் சமூகம்", "Children": "குழந்தைகள்", "Teenagers": "இளம் பருவத்தினர்", "Adults": "பெரியவர்கள்", "Senior Citizens": "முதியோர்", "Fruits": "பழங்கள்", "Snacks": "தின்பண்டங்கள்", "Cooked Meals": "சமைத்த உணவு", "Packaged Food": "பொட்டலமிட்ட உணவு", "Individually Packed": "தனித்தனியாகப் பொட்டலமிட்டவை", "Bulk Containers": "பெரிய கலன்கள்", "Either Option": "எதுவாயினும் சரி", "Yes": "ஆம்", "No": "இல்லை", "Limited": "வரையறுக்கப்பட்டது", "Low": "குறைவு", "Medium": "நடுத்தரம்", "High": "அதிகம்", "Emergency": "அவசரம்", "Current supplies available.": "தற்போது உணவுப் பொருட்கள் உள்ளன.", "May require donations soon.": "விரைவில் நன்கொடைகள் தேவைப்படலாம்.", "Need additional food within a few days.": "சில நாட்களில் கூடுதல் உணவு தேவை.", "Immediate food assistance required.": "உடனடி உணவு உதவி தேவை.", "{0} {1} per day": "ஒரு நாளுக்கு {0} {1}", "Your percentages add up to {0}%. They should total 100%.": "உங்கள் சதவீதங்களின் கூட்டுத்தொகை {0}%. அது 100% ஆக இருக்க வேண்டும்.", "← Back to home": "← முகப்புக்குத் திரும்பு", "🍲 Public donation board": "🍲 பொது நன்கொடைப் பலகை", "Available food donations": "கிடைக்கும் உணவு நன்கொடைகள்", "A live, read-only view of donations currently available. No sign-in is needed, and this page cannot dispatch a truck.": "தற்போது கிடைக்கும் நன்கொடைகளின் நேரடி, பார்வைக்கு மட்டுமான காட்சி. உள்நுழைய வேண்டியதில்லை; இந்தப் பக்கத்திலிருந்து லாரியை அனுப்ப முடியாது.", "Loading available donations…": "கிடைக்கும் நன்கொடைகள் ஏற்றப்படுகின்றன…", "This demo refreshes the board automatically when donations are submitted or allocated in this browser. Donor contact details and exact pickup addresses are kept off this public view.": "இந்த உலாவியில் நன்கொடைகள் சமர்ப்பிக்கப்படும்போதோ ஒதுக்கப்படும்போதோ இந்த டெமோ பலகையைத் தானாகப் புதுப்பிக்கும். நன்கொடையாளரின் தொடர்பு விவரங்களும் துல்லியமான முகவரிகளும் இந்தப் பொதுக் காட்சியில் காட்டப்படாது.", "Return to dashboard": "முகப்புப் பக்கத்துக்குத் திரும்பு", "← Back to requirement confirmation": "← தேவை உறுதிப்படுத்தலுக்குத் திரும்பு", "🥗 NGO donation matching": "🥗 தொண்டு நிறுவன நன்கொடைப் பொருத்தம்", "Food donations that meet your requirements": "உங்கள் தேவைகளுக்குப் பொருந்தும் உணவு நன்கொடைகள்", "Only donation centres that meet your food category, allergen and quantity requirements are shown.": "உங்கள் உணவு வகை, ஒவ்வாமை, அளவுத் தேவைகளுக்குப் பொருந்தும் நன்கொடை மையங்கள் மட்டுமே காட்டப்படுகின்றன.", "Matching is a local demo using information saved in this browser only; it is not shared across devices. Confirm food safety and allergen labels at collection.": "பொருத்துதல் என்பது இந்த உலாவியில் சேமிக்கப்பட்ட தகவலை மட்டும் பயன்படுத்தும் உள்ளூர் டெமோ; இது சாதனங்களுக்கிடையே பகிரப்படாது. உணவைப் பெறும்போது உணவுப் பாதுகாப்பையும் ஒவ்வாமை லேபிள்களையும் உறுதிசெய்யவும்.", "Back to requirements": "தேவைகளுக்குத் திரும்பு", "{0} currently available donation centre. This board is view-only.": "தற்போது {0} நன்கொடை மையம் கிடைக்கிறது. இந்தப் பலகை பார்வைக்கு மட்டுமே.", "{0} currently available donation centres. This board is view-only.": "தற்போது {0} நன்கொடை மையங்கள் கிடைக்கின்றன. இந்தப் பலகை பார்வைக்கு மட்டுமே.", "No available donations right now": "தற்போது கிடைக்கும் நன்கொடைகள் இல்லை", "New donations will appear here automatically after a donor submits them. Fully allocated donations disappear from this board.": "நன்கொடையாளர் சமர்ப்பித்த பிறகு புதிய நன்கொடைகள் இங்கே தானாகத் தோன்றும். முழுமையாக ஒதுக்கப்பட்ட நன்கொடைகள் இந்தப் பலகையிலிருந்து மறைந்துவிடும்.", "Partially allocated · balance available": "பகுதியளவு ஒதுக்கப்பட்டது · மீதம் கிடைக்கும்", "Available": "கிடைக்கும்", "Donation centre": "நன்கொடை மையம்", "Food:": "உணவு:", "Not specified": "குறிப்பிடப்படவில்லை", "Allergens present:": "உள்ள ஒவ்வாமைப் பொருட்கள்:", "None declared": "எதுவும் குறிப்பிடப்படவில்லை", "{0} {1} available": "{0} {1} கிடைக்கிறது", "Pickup area:": "உணவு பெறும் பகுதி:", "Area not specified": "பகுதி குறிப்பிடப்படவில்லை", "Last listed:": "கடைசியாகப் பட்டியலிடப்பட்டது:", "Recently": "சமீபத்தில்", "Your organization": "உங்கள் அமைப்பு", "NGO: {0} · Required: {1} {2} ({3} {2}/day × {4} {5}). {6} {7} found.": "தொண்டு நிறுவனம்: {0} · தேவை: {1} {2} (நாளொன்றுக்கு {3} {2} × {4} {5}). {6} {7} கண்டறியப்பட்டனர்.", "day": "நாள்", "days": "நாள்கள்", "matching donor": "பொருந்தும் நன்கொடையாளர்", "matching donors": "பொருந்தும் நன்கொடையாளர்கள்", "No matching donations available yet": "பொருந்தும் நன்கொடைகள் இதுவரை இல்லை", "A donation is shown only if its remaining quantity meets your total requirement, its unit matches (meals with meals or kg with kg), its food category is accepted, and it contains NONE of the allergens your NGO selected to avoid.": "ஒரு நன்கொடை காட்டப்பட, அதன் மீதமுள்ள அளவு உங்கள் மொத்தத் தேவையை எட்ட வேண்டும்; அலகு பொருந்த வேண்டும் (உணவுகளுக்கு உணவுகள், கி.கி.-க்கு கி.கி.); அதன் உணவு வகை ஏற்கப்பட்டதாக இருக்க வேண்டும்; உங்கள் தொண்டு நிறுவனம் தவிர்க்கத் தேர்ந்தெடுத்த ஒவ்வாமைப் பொருட்களில் எதுவும் அதில் இருக்கக் கூடாது.", "Important allergen rule:": "முக்கிய ஒவ்வாமை விதி:", "if the donor selects Nuts because the food contains nuts, and the NGO selects Nuts because it must avoid nuts, that donation is intentionally excluded for safety.": "உணவில் கொட்டைகள் இருப்பதால் நன்கொடையாளர் “கொட்டைகள்” என்பதைத் தேர்ந்தெடுத்து, தொண்டு நிறுவனம் கொட்டைகளைத் தவிர்க்க வேண்டியிருப்பதால் அதையே தேர்ந்தெடுத்தால், பாதுகாப்புக்காக அந்த நன்கொடை வேண்டுமென்றே விலக்கப்படும்.", "Donations saved in this browser can be checked again when more donation centres register here.": "இந்த உலாவியில் சேமிக்கப்பட்ட நன்கொடைகள், மேலும் நன்கொடை மையங்கள் இங்கே பதிவு செய்யும்போது மீண்டும் சரிபார்க்கப்படலாம்.", "Eligible donation": "தகுதியான நன்கொடை", "Allergens declared:": "குறிப்பிடப்பட்ட ஒவ்வாமைப் பொருட்கள்:", "Your allocation:": "உங்கள் ஒதுக்கீடு:", "Pickup:": "பெறும் இடம்:", "Not provided": "வழங்கப்படவில்லை", "Contact:": "தொடர்பு:", "Choose this donation & dispatch truck": "இந்த நன்கொடையைத் தேர்ந்தெடுத்து லாரியை அனுப்பு", "📍 Live tracker · For donors": "📍 நேரடிக் கண்காணிப்பு · நன்கொடையாளர்களுக்கு", "Your pickup status": "உங்கள் உணவு பெறும் நிலை", "Tracking appears only after an NGO selects your donation.": "ஒரு தொண்டு நிறுவனம் உங்கள் நன்கொடையைத் தேர்ந்தெடுத்த பிறகே கண்காணிப்பு தோன்றும்.", "📍 Live tracker · For charities / NGOs": "📍 நேரடிக் கண்காணிப்பு · அறக்கட்டளை / தொண்டு நிறுவனங்களுக்கு", "A food truck is coming to you": "உணவு லாரி உங்களை நோக்கி வருகிறது", "Follow the truck carrying donated food to your organization.": "நன்கொடை உணவை உங்கள் அமைப்புக்குக் கொண்டு வரும் லாரியைப் பின்தொடருங்கள்.", "⏳ Waiting for NGO selection": "⏳ தொண்டு நிறுவனத் தேர்வுக்காகக் காத்திருக்கிறது", "Your donation has been submitted, but no NGO has selected it yet. Truck tracking will appear here only after an NGO chooses your donation.": "உங்கள் நன்கொடை சமர்ப்பிக்கப்பட்டது, ஆனால் எந்தத் தொண்டு நிறுவனமும் இன்னும் அதைத் தேர்ந்தெடுக்கவில்லை. ஒரு தொண்டு நிறுவனம் உங்கள் நன்கொடையைத் தேர்ந்தெடுத்த பிறகே லாரி கண்காணிப்பு இங்கே தோன்றும்.", "Live (demo)": "நேரலை (டெமோ)", "Truck assigned": "லாரி ஒதுக்கப்பட்டது", "On the way": "வழியில் உள்ளது", "Almost there": "கிட்டத்தட்ட வந்துவிட்டது", "Arrived": "வந்து சேர்ந்தது", "Estimated arrival": "மதிப்பிடப்பட்ட வருகை", "Distance left": "மீதமுள்ள தூரம்", "Status": "நிலை", "Starting…": "தொடங்குகிறது…", "Live map of the food truck": "உணவு லாரியின் நேரடி வரைபடம்", "Prototype: the truck movement is simulated and sped up (about 1 minute, and it keeps running if you leave this page). It will show the real driver location once connected to a GPS feed. Map tiles © Esri / OpenStreetMap contributors.": "முன்மாதிரி: லாரியின் இயக்கம் உருவகப்படுத்தப்பட்டு வேகப்படுத்தப்பட்டுள்ளது (சுமார் 1 நிமிடம்; இந்தப் பக்கத்தை விட்டுச் சென்றாலும் தொடர்ந்து இயங்கும்). GPS இணைப்பு கிடைத்ததும் ஓட்டுநரின் உண்மையான இருப்பிடத்தைக் காட்டும். வரைபடத் தளங்கள் © Esri / OpenStreetMap பங்களிப்பாளர்கள்.", "min": "நிமிடம்", "km": "கி.மீ.", "Truck {0} · Driver: {1} (sample)": "லாரி {0} · ஓட்டுநர்: {1} (மாதிரி)", "Murugan K.": "முருகன் கே.", "Selvam R.": "செல்வம் ஆர்.", "Anitha P.": "அனிதா பி.", "Track your pickup truck": "உணவு பெறும் லாரியைக் கண்காணியுங்கள்", "A ReServe truck is on its way to collect your food from {0}.": "ReServe லாரி {0} முகவரியிலிருந்து உங்கள் உணவைப் பெற வந்துகொண்டிருக்கிறது.", "A ReServe truck is on its way to collect your food.": "ReServe லாரி உங்கள் உணவைப் பெற வந்துகொண்டிருக்கிறது.", "Truck starts here": "லாரி இங்கிருந்து புறப்படுகிறது", "Your pickup point": "உங்கள் உணவு பெறும் இடம்", "Incoming food truck": "வந்துகொண்டிருக்கும் உணவு லாரி", "Donor pickup point": "நன்கொடையாளரிடம் பெறும் இடம்", "your organization": "உங்கள் அமைப்பு", "sample donation: 150 meals": "மாதிரி நன்கொடை: 150 உணவுகள்", "A ReServe truck has been dispatched and is bringing {0} from {1} to {2}. The route shown is a prototype simulation.": "ReServe லாரி அனுப்பப்பட்டுள்ளது; அது {1} இடமிருந்து {2} அமைப்புக்கு {0} கொண்டு வருகிறது. காட்டப்படும் வழி முன்மாதிரி உருவகமாகும்.", "A ReServe truck has been dispatched and is bringing {0} to {1}. The route shown is a prototype simulation.": "ReServe லாரி அனுப்பப்பட்டுள்ளது; அது {1} அமைப்புக்கு {0} கொண்டு வருகிறது. காட்டப்படும் வழி முன்மாதிரி உருவகமாகும்.", "The extra {0} {1} remains available for another eligible NGO.": "கூடுதலாக உள்ள {0} {1} மற்றொரு தகுதியுள்ள தொண்டு நிறுவனத்துக்குக் கிடைக்கும்.", "The donation quantity has been fully allocated.": "நன்கொடையின் முழு அளவும் ஒதுக்கப்பட்டுவிட்டது.", "NGO / distribution centre": "தொண்டு நிறுவனம் / விநியோக மையம்", "Updated": "புதுப்பிக்கப்பட்டது", "Donor": "நன்கொடையாளர்", "Collect within": "இதற்குள் பெற வேண்டும்", "hours": "மணி நேரம்", "Nearest NGO": "அருகிலுள்ள தொண்டு நிறுவனம்", "Organisation": "அமைப்பு", "Volunteers": "தன்னார்வலர்கள்", "People": "மக்கள்", "Meals needed": "தேவையான உணவுகள்", "Nearby NGO": "அருகிலுள்ள தொண்டு நிறுவனம்", "None registered yet": "இதுவரை பதிவு செய்யப்படவில்லை", "Send food here": "உணவை இங்கே அனுப்பு", "Directions in Google Maps": "Google Maps-இல் வழிகாட்டி", "Sending food to: {0} ({1})": "உணவு அனுப்பப்படும் இடம்: {0} ({1})", "Showing sample area: {0}": "மாதிரிப் பகுதி காட்டப்படுகிறது: {0}", "Not found. Try a sample area such as Gandhipuram, RS Puram or Peelamedu.": "கிடைக்கவில்லை. காந்திபுரம், ஆர்.எஸ். புரம் அல்லது பீளமேடு போன்ற மாதிரிப் பகுதியை முயலவும்.", "The map could not be loaded.": "வரைபடத்தை ஏற்ற முடியவில்லை.", "Map background could not be loaded.": "வரைபடப் பின்னணியை ஏற்ற முடியவில்லை.", "Pins and search still work. Check your internet connection.": "குறிகளும் தேடலும் தொடர்ந்து செயல்படும். உங்கள் இணைய இணைப்பைச் சரிபார்க்கவும்.", "Retry": "மீண்டும் முயல்", "Gandhipuram": "காந்திபுரம்", "Ukkadam": "உக்கடம்", "Peelamedu": "பீளமேடு", "Singanallur": "சிங்காநல்லூர்", "Town Hall": "டவுன் ஹால்", "RS Puram": "ஆர்.எஸ். புரம்", "Race Course": "ரேஸ் கோர்ஸ்", "Saibaba Colony": "சாய்பாபா காலனி", "Saibaba Colony Distribution Centre": "சாய்பாபா காலனி விநியோக மையம்", "Ukkadam Community Kitchen": "உக்கடம் சமூகச் சமையலறை", "Peelamedu Food Bank": "பீளமேடு உணவு வங்கி", "Annapoorna Trust (demo)": "அன்னபூர்ணா அறக்கட்டளை (டெமோ)", "Seva Kitchen (demo)": "சேவா கிச்சன் (டெமோ)", "Helping Hands (demo)": "ஹெல்பிங் ஹேண்ட்ஸ் (டெமோ)", "Sample Wedding Hall (demo)": "மாதிரி திருமண மண்டபம் (டெமோ)", "Sample Restaurant (demo)": "மாதிரி உணவகம் (டெமோ)", "Sample Canteen (demo)": "மாதிரி உணவுக்கூடம் (டெமோ)", "Sample: 10:00": "மாதிரி: 10:00", "Sample: 09:30": "மாதிரி: 09:30", "Sample: 10:15": "மாதிரி: 10:15", "Sample: 08:45": "மாதிரி: 08:45", "Sample: 09:00": "மாதிரி: 09:00", "Sample: 10:20": "மாதிரி: 10:20", "Sample: 10:05": "மாதிரி: 10:05", "Sample: 09:50": "மாதிரி: 09:50", "Start here: choose Food Donator or Charity / NGO": "இங்கே தொடங்குங்கள்: உணவு நன்கொடையாளர் அல்லது அறக்கட்டளை / தொண்டு நிறுவனத்தைத் தேர்ந்தெடுக்கவும்", "Donor · Step 1 of 2: Verification": "நன்கொடையாளர் · படி 1 / 2: சரிபார்ப்பு", "Donor · Verification submitted": "நன்கொடையாளர் · சரிபார்ப்பு சமர்ப்பிக்கப்பட்டது", "Donor · Step 2 of 2: Donation details": "நன்கொடையாளர் · படி 2 / 2: நன்கொடை விவரங்கள்", "Donor · All done, thank you": "நன்கொடையாளர் · அனைத்தும் முடிந்தது, நன்றி", "Charity · Step 1 of 2: Registration": "அறக்கட்டளை · படி 1 / 2: பதிவு", "Charity · Registered": "அறக்கட்டளை · பதிவு செய்யப்பட்டது", "Donor · Live truck tracker": "நன்கொடையாளர் · நேரடி லாரி கண்காணிப்பு", "Charity · Live truck tracker": "அறக்கட்டளை · நேரடி லாரி கண்காணிப்பு", "Charity · Step 2 of 2: Requirement details": "அறக்கட்டளை · படி 2 / 2: தேவை விவரங்கள்", "Charity · All done, thank you": "அறக்கட்டளை · அனைத்தும் முடிந்தது, நன்றி", "“Turning surplus into support.”": "“மிகுதியை ஆதரவாக மாற்றுகிறோம்.”", "© 2026 ReServe. All rights reserved.": "© 2026 ReServe. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.", "Email: contact@reserve.example": "மின்னஞ்சல்: contact@reserve.example", "Phone: +91 00000 00000": "தொலைபேசி: +91 00000 00000", "Privacy Policy": "தனியுரிமைக் கொள்கை", "Terms of Service": "சேவை விதிமுறைகள்", "Support": "ஆதரவு", "Dismiss": "மூடு", "Donation allocation confirmed": "நன்கொடை ஒதுக்கீடு உறுதிசெய்யப்பட்டது", "📍 Track this donation": "📍 இந்த நன்கொடையைக் கண்காணி", "Continue matching": "பொருத்துதலைத் தொடரவும்", "♻️ Food waste recovery": "♻️ உணவுக் கழிவு மீட்பு", "The entered quantity will be directed to fertilizer or biogas centres instead of being wasted.": "உள்ளிட்ட அளவு வீணாக்கப்படாமல் உரம் அல்லது உயிரிவாயு மையங்களுக்கு அனுப்பப்படும்.", "Got it": "சரி"},LH=[],DYN=[],ORIG=new WeakMap(),ATTRS=['placeholder','aria-label','title','alt'];
+  function has(k){return Object.prototype.hasOwnProperty.call(TA,k)}
+  function T(k){return(LANG==='ta'&&has(k))?TA[k]:k}
+  function TF(k,a){return T(k).replace(/\{(\d+)\}/g,function(m,i){return a[+i]})}
+  function onLang(f){LH.push(f)}
+  function paint(el){var d=el.__d;if(!d)return;var v=d[0]();if(d[1])el.innerHTML=v;else el.textContent=v}
+  function dyn(el,fn,html){if(!el)return;el.__d=[fn,!!html];if(DYN.indexOf(el)<0)DYN.push(el);paint(el)}
+  function undyn(el){if(!el)return;el.__d=null;el.textContent=''}
+  function trNode(n){
+    var o=ORIG.get(n);if(o===undefined){o=n.nodeValue;ORIG.set(n,o)}
+    var m=o.match(/^(\s*)([\s\S]*?)(\s*)$/),k=m[2].replace(/\s+/g,' ');if(!k)return;
+    var v=(LANG==='ta'&&has(k))?m[1]+TA[k]+m[3]:o;if(n.nodeValue!==v)n.nodeValue=v;
+  }
+  function trAttr(n,a){
+    var oa=n.__oa||(n.__oa={});if(oa[a]===undefined)oa[a]=n.getAttribute(a);
+    var o=oa[a],k=o.replace(/\s+/g,' ').trim();n.setAttribute(a,(LANG==='ta'&&has(k))?TA[k]:o);
+  }
+  function walk(n){
+    if(n.nodeType===3){trNode(n);return}
+    if(n.nodeType!==1)return;
+    var tg=n.tagName;if(tg==='SCRIPT'||tg==='STYLE')return;
+    for(var i=0;i<ATTRS.length;i++)if(n.hasAttribute(ATTRS[i]))trAttr(n,ATTRS[i]);
+    if(n.hasAttribute('data-dyn'))return;
+    for(var c=n.firstChild;c;c=c.nextSibling)walk(c);
+  }
+  function setLang(l){
+    LANG=l;document.documentElement.lang=l==='ta'?'ta':'en';
+    walk(document.body);document.title=T('ReServe | Food Donation Portal');
+    document.querySelectorAll('.lang button').forEach(function(b){var on=b.getAttribute('data-lang')===l;b.classList.toggle('on',on);b.setAttribute('aria-pressed',on)});
+    DYN.forEach(paint);LH.forEach(function(f){f()});
+  }
+  /* regions that JavaScript fills in: the walker leaves these alone and they repaint themselves */
+  ['gl','u2','rq-next','rs-ppl','rs-meals','rs-foods','rs-ages','rs-allergy','rs-urg','em-msg','em-sel-t','photoGeo','locationResult','idNumLabel','idNumHint','ok-dest','public-summary','public-list','match-summary','match-list','dt-box','nr-box','rq-dur','rq-prep','rq-dry','g-ages','rq-g-foods','g-allergy','g-pack','g-cold','g-urg','em-places','spoilt-message'].forEach(function(id){var e=$(id);if(e)e.setAttribute('data-dyn','')});
+  document.querySelectorAll('.verr,#q-dist .err').forEach(function(e){e.setAttribute('data-dyn','')});
+  dyn($('em-msg'),function(){return T('Searches the sample areas.')});
+  /* A browser reload starts a fresh demo session: clear donations without needing NGO dispatch.
+     Normal in-page navigation does not clear them. */
+  try {
+    var navEntry=performance.getEntriesByType&&performance.getEntriesByType('navigation')[0];
+    if(navEntry&&navEntry.type==='reload') localStorage.removeItem('reserve_donations_v2');
+  } catch(e) {}
+
+  var splash=$('splash');
+  function endSplash(){if(splash.classList.contains('leaving')||splash.classList.contains('done'))return;splash.classList.add('leaving');setTimeout(function(){splash.classList.add('done')},850)}
+  function startSplash(){splash.classList.remove('wait');setTimeout(function(){splash.classList.add('done')},10950)}
+  $('skip').addEventListener('click',endSplash);
+
+  var burger=$('burger'),mnav=$('mnav');
+  burger.addEventListener('click',function(){var o=mnav.classList.toggle('open');burger.setAttribute('aria-expanded',o);burger.textContent=o?'✕':'☰'});
+
+  function show(id){
+    clearTimeout(window.RS_auto);
+    if(window.RS_trk)window.RS_trk.forEach(function(t){t.stop()});
+    document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('on',v.id===id)});
+    if(id==='v-donor'){$('f-donor').hidden=false;$('ok-donor').hidden=true;donorMap.init()}
+    if(id==='v-ngo'){$('f-ngo').hidden=false;$('ok-ngo').hidden=true}
+    if(id==='v-verify')$('v-verify').dispatchEvent(new Event('vreset'));
+    if(id==='v-ngoreq' && $('ok-req').hidden)rqOpen();
+    if(id==='v-match')renderMatches();
+    if(id==='v-public')renderPublicDonations();
+    if(id==='v-dtrack'){renderDonorNotes();dTrk.start(true)}
+    if(id==='v-ntrack')rTrk.start(true);
+    mnav.classList.remove('open');burger.textContent='☰';
+    window.scrollTo({top:0,behavior:'smooth'});setTimeout(updateProgress,0);
+  }
+  document.addEventListener('click',function(e){
+    var go=e.target.closest('[data-go]');
+    if(go){e.preventDefault();show(go.getAttribute('data-go'));return}
+  });
+
+  function bad(g,b){g.classList.toggle('invalid',b);return b}
+  function basic(form){
+    var first=null;
+    form.querySelectorAll('.field').forEach(function(g){
+      var el=g.querySelector('input[data-req],input[data-phone],input[data-email],textarea[data-req]');
+      if(!el)return;var v=el.value.trim(),b=false;
+      if(el.hasAttribute('data-req')&&v==='')b=true;
+      if(!b&&el.hasAttribute('data-phone')){var d=v.replace(/\D/g,'');b=!(d.length>=7&&d.length<=15&&/^[+\d\s()-]+$/.test(v))}
+      if(!b&&el.hasAttribute('data-email')&&v!=='')b=!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+      if(bad(g,b)&&!first)first=el;
+    });
+    return first;
+  }
+  function done(first){if(first){first.scrollIntoView({behavior:'smooth',block:'center'});if(first.focus)first.focus();return false}return true}
+
+  /* Donator verification, then on to the event-type page */
+  (function(){
+    var form=$('verifyForm'),photoInput=$('photo'),preview=$('preview'),locBtn=$('locBtn'),locationResult=$('locationResult');
+    var verifiedLocation=null,photoFile=null,photoGps=null,advance;
+
+    function showError(id,msg){dyn($(id+'Error'),function(){return T(msg)});var f=$(id);if(f)f.classList.add('invalid')}
+    function clearErrors(){
+      form.querySelectorAll('.verr').forEach(function(e){undyn(e)});
+      form.querySelectorAll('.invalid').forEach(function(e){e.classList.remove('invalid')});
+    }
+    $('v-verify').addEventListener('vreset',function(){
+      clearTimeout(advance);form.reset();clearErrors();$('idNumField').hidden=true;
+      verifiedLocation=null;photoFile=null;photoGps=null;
+      preview.style.display='none';undyn($('photoGeo'));undyn(locationResult);
+      form.hidden=false;$('vSuccess').hidden=true;
+    });
+
+    /* Read the GPS location stored inside a photo (EXIF data) */
+    function readGps(file){
+      return file.arrayBuffer().then(function(buf){
+        try{
+          var view=new DataView(buf),tiff=null,pos;
+          if(view.getUint16(0)===0xFFD8){
+            pos=2;
+            while(pos+4<view.byteLength&&view.getUint8(pos)===0xFF){
+              var marker=view.getUint8(pos+1);
+              if(marker===0xDA)break;
+              if(marker===0xE1&&view.getUint32(pos+4)===0x45786966){tiff=pos+10;break}
+              pos+=2+view.getUint16(pos+2);
+            }
+          }else if(view.getUint32(0)===0x89504E47){
+            pos=8;
+            while(pos+8<view.byteLength){
+              if(view.getUint32(pos+4)===0x65584966){tiff=pos+8;break}
+              pos+=12+view.getUint32(pos);
+            }
+          }
+          if(tiff===null)return null;
+          var little=view.getUint16(tiff)===0x4949;
+          var u16=function(o){return view.getUint16(tiff+o,little)},u32=function(o){return view.getUint32(tiff+o,little)};
+          function readTags(offset){var t={},c=u16(offset);for(var i=0;i<c;i++){var e=offset+2+i*12;t[u16(e)]=e+8}return t}
+          function toDecimal(vp,ref){
+            var base=u32(vp),part=function(i){return u32(base+i*8)/u32(base+i*8+4)};
+            var v=part(0)+part(1)/60+part(2)/3600;return(ref==='S'||ref==='W')?-v:v;
+          }
+          var ifd0=readTags(u32(4));
+          if(!ifd0[0x8825])return null;
+          var gps=readTags(u32(ifd0[0x8825]));
+          if(!gps[2]||!gps[4])return null;
+          var latRef=String.fromCharCode(view.getUint8(tiff+gps[1])),lngRef=String.fromCharCode(view.getUint8(tiff+gps[3]));
+          var lat=toDecimal(gps[2],latRef),lng=toDecimal(gps[4],lngRef);
+          if(isNaN(lat)||isNaN(lng)||(lat===0&&lng===0))return null;
+          return{lat:lat,lng:lng};
+        }catch(err){return null}
+      });
+    }
+    function distanceMetres(a,b){
+      var rad=function(d){return d*Math.PI/180};
+      var h=Math.pow(Math.sin(rad(b.lat-a.lat)/2),2)+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.pow(Math.sin(rad(b.lng-a.lng)/2),2);
+      return 2*6371000*Math.asin(Math.sqrt(h));
+    }
+
+    photoInput.addEventListener('change',function(){
+      var file=photoInput.files[0];
+      undyn($('photoError'));photoInput.classList.remove('invalid');
+      preview.style.display='none';photoFile=null;photoGps=null;undyn($('photoGeo'));
+      if(!file)return;
+      if(['image/jpeg','image/png'].indexOf(file.type)<0){showError('photo','Please upload a JPG, JPEG or PNG image.');photoInput.value='';return}
+      if(file.size>5*1024*1024){showError('photo','The image is larger than 5 MB. Please choose a smaller one.');photoInput.value='';return}
+      preview.src=URL.createObjectURL(file);preview.style.display='block';
+      dyn($('photoGeo'),function(){return T('Checking the photo for location data...')});
+      readGps(file).then(function(gps){
+        if(photoInput.files[0]!==file)return;
+        if(!gps){
+          preview.style.display='none';photoInput.value='';undyn($('photoGeo'));
+          showError('photo','This photo has no location data. Turn on location tagging in your camera settings, take a new photo at your kitchen and upload it.');
+          return;
+        }
+        photoFile=file;photoGps=gps;window.RS_donorLoc=window.RS_donorLoc||{lat:gps.lat,lng:gps.lng};
+        dyn($('photoGeo'),function(){return'<span class="okt">'+T('Geotag found in photo:')+'</span> '+gps.lat.toFixed(5)+', '+gps.lng.toFixed(5)},true);
+      });
+    });
+
+    locBtn.addEventListener('click',function(){
+      undyn($('locationError'));
+      if(!navigator.geolocation){dyn(locationResult,function(){return T('Your browser does not support location access.')});return}
+      dyn(locationResult,function(){return T('Requesting your location...')});
+      navigator.geolocation.getCurrentPosition(function(pos){
+        verifiedLocation={lat:pos.coords.latitude,lng:pos.coords.longitude,accuracy:Math.round(pos.coords.accuracy)};window.RS_donorLoc={lat:pos.coords.latitude,lng:pos.coords.longitude};
+        var vl=verifiedLocation;dyn(locationResult,function(){return'<span class="okt">'+T('Location captured.')+'</span><br>'+TF('Latitude {0}, Longitude {1} (accuracy about {2} m)',[vl.lat.toFixed(5),vl.lng.toFixed(5),vl.accuracy])},true);
+      },function(error){
+        verifiedLocation=null;var msg='We could not get your location.';
+        if(error.code===1)msg='Location permission was denied. Please allow location access and try again.';
+        if(error.code===2)msg='Your location is unavailable right now. Please try again.';
+        if(error.code===3)msg='Getting your location took too long. Please try again.';
+        undyn(locationResult);dyn($('locationError'),function(){return T(msg)});
+      },{enableHighAccuracy:true,timeout:15000});
+    });
+
+
+    /* Identity verification: show the Aadhaar or PAN label when that type is chosen */
+    var IDS={
+      'Aadhaar':{label:'Aadhaar number',ph:'1234 5678 9012',hint:'12 digits',max:14,mode:'numeric',clean:function(v){return v.replace(/\D/g,'').slice(0,12)},show:function(v){return v.replace(/(\d{4})(?=\d)/g,'$1 ')},ok:/^\d{12}$/,msg:'Enter a valid 12-digit Aadhaar number.'},
+      'PAN':{label:'PAN card number',ph:'ABCDE1234F',hint:'5 letters, 4 digits, 1 letter',max:10,mode:'text',clean:function(v){return v.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,10)},show:function(v){return v},ok:/^[A-Z]{5}\d{4}[A-Z]$/,msg:'Enter a valid PAN, e.g. ABCDE1234F.'}
+    };
+    $('idType').addEventListener('change',function(){
+      var t=IDS[this.value];$('idNumField').hidden=!t;$('idNum').value='';undyn($('idNumError'));$('idNum').classList.remove('invalid');
+      if(!t)return;
+      dyn($('idNumLabel'),function(){return T(t.label)+' <span class="opt">'+T('(optional)')+'</span>'},true);
+      $('idNum').placeholder=t.ph;$('idNum').maxLength=t.max;$('idNum').inputMode=t.mode;
+      dyn($('idNumHint'),function(){return TF('Format: {0}',[T(t.hint)])});
+    });
+    $('idNum').addEventListener('input',function(){var t=IDS[$('idType').value];if(t)this.value=t.show(t.clean(this.value))});
+
+    form.addEventListener('submit',function(e){
+      e.preventDefault();clearErrors();var valid=true;
+      var fssai=$('fssai').value.trim();
+      if(fssai===''){showError('fssai','Enter your FSSAI certificate number.');valid=false}
+      else if(!/^\d{14}$/.test(fssai)){showError('fssai','The FSSAI number must be exactly 14 digits.');valid=false}
+      if($('idType').value===''){showError('idType','Select an ID type.');valid=false}
+      var t=IDS[$('idType').value];
+      var n=t?t.clean($('idNum').value):'';
+      if(t&&n!==''&&!t.ok.test(n)){showError('idNum',t.msg);valid=false}
+      if(verifiedLocation&&photoGps&&distanceMetres(photoGps,verifiedLocation)>1000){
+        var kmAway=(distanceMetres(photoGps,verifiedLocation)/1000).toFixed(1);
+        dyn($('locationError'),function(){return TF("The photo's location is about {0} km from your current location. Upload a photo taken at your kitchen.",[kmAway])});
+        valid=false;
+      }
+      if(!$('agree').checked){dyn($('agreeError'),function(){return T('Please confirm the declaration.')});valid=false}
+      if(!valid){
+        var first=form.querySelector('.invalid,.verr:not(:empty)');
+        if(first)first.scrollIntoView({behavior:'smooth',block:'center'});
+        return;
+      }
+      /* Status is always "Pending Review"; approval is done by an admin. Send the data to your server here. */
+      form.hidden=true;$('vSuccess').hidden=false;
+      window.scrollTo({top:0,behavior:'smooth'});
+
+    });
+  })();
+
+  function calc(){$('u2').textContent=T($('unit').value)}
+  $('unit').addEventListener('input',calc);
+
+  /* Explain where the spoilt food will go as soon as the donor finishes entering it. */
+  var spoiltInput=$('spoilt'),spoiltModal=$('spoilt-modal');
+  function showSpoiltNotice(){
+    var amount=parseFloat(spoiltInput.value),available=parseFloat($('qty').value)||0;
+    if(!Number.isFinite(amount)||amount<=0||amount>available)return;
+    var su=$('unit').value;dyn($('spoilt-message'),function(){return TF('{0} {1} of spoilt food will be sent to fertilizer / biogas centres.',[amount,T(su)])});
+    spoiltModal.hidden=false;
+  }
+  spoiltInput.addEventListener('change',showSpoiltNotice);
+  spoiltInput.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();showSpoiltNotice();}});
+  $('spoilt-close').addEventListener('click',function(){spoiltModal.hidden=true;spoiltInput.focus();});
+  spoiltModal.addEventListener('click',function(e){if(e.target===spoiltModal)spoiltModal.hidden=true;});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!spoiltModal.hidden)spoiltModal.hidden=true;});
+
+  /* Donor form */
+  var fd=$('f-donor'),toast=$('toast'),tt;
+  fd.addEventListener('submit',function(e){
+    e.preventDefault();
+    var first=basic(fd),qty=parseFloat($('qty').value)||0,sp=parseFloat($('spoilt').value);
+    var foods=fd.querySelectorAll('input[name=food]:checked').length>0;
+    var gF=$('g-foods'),gQ=$('g-qty'),gC=$('g-consent'),gS=$('g-spoilt');
+    if(bad(gF,!foods)&&!first)first=gF.querySelector('input');
+    if(bad(gQ,!(qty>0))&&!first)first=$('qty');
+    if(bad(gC,!fd.querySelector('input[name=consent]:checked'))&&!first)first=gC.querySelector('input');
+    if(bad(gS,!isNaN(sp)&&(sp<0||sp>qty))&&!first)first=$('spoilt');
+    if(!done(first))return;
+    var donation={
+      id:'don-'+Date.now()+'-'+Math.floor(Math.random()*100000),
+      name:$('d-name').value.trim(),address:$('d-addr').value.trim(),phone:$('d-phone').value.trim(),
+      email:$('d-email').value.trim(),target:$('ngo').value.trim(),
+      foods:[].slice.call(fd.querySelectorAll('input[name=food]:checked')).map(function(x){return x.value}),
+      allergens:[].slice.call(fd.querySelectorAll('input[name=d-allergen]:checked')).map(function(x){return x.value}),
+      quantity:qty,unit:$('unit').value,prepTime:$('d-prep').value,remaining:qty,spoiltQuantity:(!isNaN(sp)&&sp>0?sp:0),spoiltUnit:$('unit').value,notes:$('d-notes').value.trim(),createdAt:new Date().toISOString(),status:'Available'
+    };
+    var donations=[];try{donations=JSON.parse(localStorage.getItem('reserve_donations_v2')||'[]')}catch(e){}
+    donations.push(donation);try{localStorage.setItem('reserve_donations_v2',JSON.stringify(donations))}catch(e){}
+    window.RS_currentDonation=donation;window.RS_lastDonation={q:qty,unit:donation.unit};
+    fd.hidden=true;$('ok-donor').hidden=false;$('ok-donor').scrollIntoView({block:'center',behavior:'smooth'});var selN=sel;$('ok-dest').hidden=!selN;dyn($('ok-dest'),function(){return selN?TF('Your food is also marked for: {0}.',[T(selN.name)]):''});
+    toast.hidden=false;clearTimeout(tt);tt=setTimeout(function(){toast.hidden=true},6000);
+    dTrk.reset();clearTimeout(window.RS_auto);renderPublicDonations();
+  });
+  fd.querySelectorAll('input[name="d-allergen"]').forEach(function(box){
+    box.addEventListener('change',function(){
+      var none=$('d-allergen-none');
+      if(box.checked&&none)none.checked=false;
+    });
+  });
+  $('d-allergen-none').addEventListener('change',function(){
+    if(this.checked)fd.querySelectorAll('input[name="d-allergen"]').forEach(function(box){box.checked=false});
+  });
+  fd.addEventListener('input',function(e){var g=e.target.closest('.field,fieldset');if(g)g.classList.remove('invalid')});
+  fd.addEventListener('change',function(e){var g=e.target.closest('fieldset');if(g)g.classList.remove('invalid')});
+  $('again').addEventListener('click',function(){
+    clearTimeout(window.RS_auto);dTrk.reset();fd.reset();calc();clearSel();fd.hidden=false;$('ok-donor').hidden=true;window.scrollTo({top:0,behavior:'smooth'});
+  });
+  $('tx').addEventListener('click',function(){toast.hidden=true});
+
+
+  /* Need map (FoodLink style): red = high demand, yellow = medium, green = food available, blue = NGO centre */
+  var EM=[
+    {id:1,name:'Gandhipuram',type:'high',lat:11.0183,lng:76.9725,people:320,meals:640,ngo:'Annapoorna Trust (demo)',updated:'Sample: 10:00'},
+    {id:2,name:'Ukkadam',type:'high',lat:10.9887,lng:76.9606,people:280,meals:560,ngo:'Seva Kitchen (demo)',updated:'Sample: 09:30'},
+    {id:3,name:'Peelamedu',type:'medium',lat:11.027,lng:77.0,people:140,meals:280,ngo:'Helping Hands (demo)',updated:'Sample: 10:15'},
+    {id:4,name:'Singanallur',type:'medium',lat:10.999,lng:77.02,people:110,meals:220,ngo:'Helping Hands (demo)',updated:'Sample: 08:45'},
+    {id:5,name:'Town Hall',type:'high',lat:10.994,lng:76.962,people:210,meals:420,ngo:'Seva Kitchen (demo)',updated:'Sample: 09:00'},
+    {id:6,name:'RS Puram',type:'donation',lat:11.007,lng:76.95,meals:300,deadline:3,donor:'Sample Wedding Hall (demo)',updated:'Sample: 10:20'},
+    {id:7,name:'Race Course',type:'donation',lat:10.999,lng:76.978,meals:180,deadline:5,donor:'Sample Restaurant (demo)',updated:'Sample: 10:05'},
+    {id:8,name:'Saibaba Colony',type:'donation',lat:11.026,lng:76.94,meals:120,deadline:2,donor:'Sample Canteen (demo)',updated:'Sample: 09:50'},
+    {id:9,name:'Saibaba Colony Distribution Centre',type:'ngo',lat:11.03,lng:76.945,ngo:'Annapoorna Trust (demo)',volunteers:24,updated:'Sample: 09:00'},
+    {id:10,name:'Ukkadam Community Kitchen',type:'ngo',lat:10.993,lng:76.965,ngo:'Seva Kitchen (demo)',volunteers:18,updated:'Sample: 09:00'},
+    {id:11,name:'Peelamedu Food Bank',type:'ngo',lat:11.023,lng:77.005,ngo:'Helping Hands (demo)',volunteers:12,updated:'Sample: 09:00'}
+  ];
+  var EC={high:'#e53935',medium:'#f5c518',donation:'#2eaa5c',ngo:'#1e6fd9'},
+      EL={high:'Urgent need',medium:'Some need',donation:'Food available',ngo:'NGO / distribution centre'},
+      sel=null;
+  function esc(t){return String(t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  function km(a,b){var r=function(x){return x*Math.PI/180},dl=r(b.lat-a.lat),dg=r(b.lng-a.lng),h=Math.sin(dl/2)*Math.sin(dl/2)+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dg/2)*Math.sin(dg/2);return 12742*Math.asin(Math.sqrt(h))}
+  function nearestNgo(p){return EM.filter(function(x){return x.type==='ngo'}).sort(function(a,b){return km(p,a)-km(p,b)})[0]}
+  function pinIcon(c){return L.divIcon({className:'',html:'<svg class="gpin" width="42" height="56" viewBox="0 0 30 40"><path d="M15 39C15 39 2 24 2 14.5a13 13 0 0 1 26 0C28 24 15 39 15 39z" fill="'+c+'" stroke="#fff" stroke-width="2"/><circle cx="15" cy="14.5" r="5.5" fill="#fff"/></svg>',iconSize:[42,56],iconAnchor:[21,55],popupAnchor:[0,-50]})}
+  function popup(d,canPick){
+    var near=d.type==='ngo'?null:nearestNgo(d),nn=near?esc(T(near.ngo))+' ('+km(d,near).toFixed(1)+' '+T('km')+')':T('None registered yet'),rows;
+    if(d.type==='donation')rows='<tr><td>'+T('Food available')+'</td><td>'+d.meals+' '+T('meals')+'</td></tr><tr><td>'+T('Donor')+'</td><td>'+esc(T(d.donor))+'</td></tr><tr><td>'+T('Collect within')+'</td><td>'+d.deadline+' '+T('hours')+'</td></tr><tr><td>'+T('Nearest NGO')+'</td><td>'+nn+'</td></tr>';
+    else if(d.type==='ngo')rows='<tr><td>'+T('Organisation')+'</td><td>'+esc(T(d.ngo))+'</td></tr><tr><td>'+T('Volunteers')+'</td><td>'+d.volunteers+'</td></tr>';
+    else rows='<tr><td>'+T('People')+'</td><td>'+d.people+'</td></tr><tr><td>'+T('Meals needed')+'</td><td>'+d.meals+'</td></tr><tr><td>'+T('Nearby NGO')+'</td><td>'+nn+'</td></tr>';
+    var pick=(canPick&&(d.type==='high'||d.type==='medium'))?'<button type="button" class="pick" data-id="'+d.id+'">'+T('Send food here')+'</button>':'';
+    return '<div class="popup"><h4>'+esc(T(d.name))+'</h4><span class="badge" style="background:'+EC[d.type]+';color:'+(d.type==='medium'?'#3b3200':'#fff')+'">'+T(EL[d.type])+'</span><table><tr><td>'+T('Updated')+'</td><td>'+esc(T(d.updated))+'</td></tr>'+rows+'</table>'+pick+'<a class="dir" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination='+d.lat+','+d.lng+'">'+T('Directions in Google Maps')+'</a></div>';
+  }
+  function choose(d){sel=d;dyn($('em-sel-t'),function(){return TF('Sending food to: {0} ({1})',[T(d.name),T(EL[d.type]).toLowerCase()])});$('em-sel').hidden=false}
+  function clearSel(){sel=null;$('em-sel').hidden=true}
+  /* One map engine, used by the donor form (canPick=true) and the charity map page (canPick=false) */
+  function makeMap(P,canPick){
+    var emap=null,elayer=null,eOn={high:1,medium:1,donation:1,ngo:1};
+  function eRender(){
+    elayer.clearLayers();
+    EM.filter(function(d){return eOn[d.type]}).forEach(function(d){
+      var nm=T(d.name);L.marker([d.lat,d.lng],{icon:pinIcon(EC[d.type]),title:nm+' ('+T(EL[d.type])+')'}).bindPopup(popup(d,canPick)).bindTooltip(nm.length>24?nm.slice(0,23)+'…':nm,{permanent:true,direction:'bottom',offset:[0,6]}).addTo(elayer);
+    });
+  }
+  function eFit(){emap.fitBounds(EM.map(function(d){return[d.lat,d.lng]}),{padding:[40,40],maxZoom:14})}
+  function fillPlaces(){var pl=$(P+'-places');if(pl)pl.innerHTML=EM.map(function(d){return'<option value="'+esc(T(d.name))+'">'}).join('')}
+  function init(){
+    if(!$(P+'-map'))return;
+    if(!emap){
+      if(typeof L==='undefined'){$(P+'-map').textContent=T('The map could not be loaded.');return}
+      emap=L.map(P+'-map',{zoomControl:false,minZoom:10,maxZoom:18}).setView([11.0168,76.9858],12);
+      /* tile providers, tried in order; switches automatically if one fails */
+      var OSM='&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors';
+      var PR=[
+        {u:'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',o:{maxZoom:18,attribution:'Tiles &copy; Esri'}},
+        {u:'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',o:{maxZoom:19,subdomains:'abcd',attribution:OSM+' &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>'}},
+        {u:'https://tile.openstreetmap.org/{z}/{x}/{y}.png',o:{maxZoom:18,attribution:OSM}}
+      ];
+      var fb=document.createElement('div');fb.className='mfb';fb.hidden=true;fb.innerHTML='<b>'+T('Map background could not be loaded.')+'</b> '+T('Pins and search still work. Check your internet connection.')+' <button type="button">'+T('Retry')+'</button>';
+      emap.getContainer().appendChild(fb);L.DomEvent.disableClickPropagation(fb);
+      var tiles=null,pi=-1,te=0,loaded=0,tmo=null;
+      function next(){if(pi<PR.length-1)use(pi+1);else fb.hidden=false}
+      function use(i){
+        if(tiles)emap.removeLayer(tiles);pi=i;te=0;loaded=0;clearTimeout(tmo);
+        tiles=L.tileLayer(PR[i].u,PR[i].o).addTo(emap);
+        tiles.on('tileload',function(){loaded=1;te=0;fb.hidden=true;clearTimeout(tmo)});
+        tiles.on('tileerror',function(){if(++te>=4&&!loaded)next()});
+        tmo=setTimeout(function(){if(!loaded)next()},6000); /* nothing loaded in 6 s: try the next provider */
+      }
+      use(0);fb.querySelector('button').onclick=function(){fb.hidden=true;use(0)};
+      L.control.zoom({position:'bottomright'}).addTo(emap);
+      L.control.scale({position:'bottomleft',imperial:false}).addTo(emap);
+      elayer=L.layerGroup().addTo(emap);eRender();
+      var lab=function(){emap.getContainer().classList.toggle('hide-labels',emap.getZoom()<12)};
+      emap.on('zoomend',lab);lab();
+      emap.on('popupopen',function(e){
+        var b=e.popup.getElement().querySelector('.pick');if(!b)return;
+        b.addEventListener('click',function(){choose(EM.filter(function(x){return x.id==b.getAttribute('data-id')})[0]);emap.closePopup()});
+      });
+      /* filters */
+      document.querySelectorAll('#'+P+'-filters .mchip').forEach(function(c){
+        c.addEventListener('click',function(){var f=c.getAttribute('data-f');eOn[f]=eOn[f]?0:1;c.classList.toggle('on',!!eOn[f]);eRender()});
+      });
+      $(P+'-all').addEventListener('click',function(){
+        for(var k in eOn)eOn[k]=1;
+        document.querySelectorAll('#'+P+'-filters .mchip').forEach(function(c){c.classList.add('on')});eRender();
+      });
+      $(P+'-fit').addEventListener('click',eFit);
+      /* search (never submits the donor form) */
+      fillPlaces();
+      function go(){
+        var q=$(P+'-q').value.trim().toLowerCase();if(!q)return;
+        var names=function(d){return[d.name.toLowerCase(),T(d.name).toLowerCase()]};
+        var hit=EM.filter(function(d){return d.type!=='ngo'&&names(d).indexOf(q)>-1})[0]||EM.filter(function(d){return names(d).some(function(n){return n.indexOf(q)>-1})})[0];
+        if(hit){emap.flyTo([hit.lat,hit.lng],15);dyn($(P+'-msg'),function(){return TF('Showing sample area: {0}',[T(hit.name)])})}
+        else dyn($(P+'-msg'),function(){return T('Not found. Try a sample area such as Gandhipuram, RS Puram or Peelamedu.')});
+      }
+      $(P+'-go').addEventListener('click',go);
+      $(P+'-q').addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();go()}});
+      /* keep sized when layout changes */
+      if(window.ResizeObserver){var rt;new ResizeObserver(function(){clearTimeout(rt);rt=setTimeout(function(){emap.invalidateSize()},150)}).observe(emap.getContainer())}
+    }
+    emap.invalidateSize();eFit();
+    setTimeout(function(){emap.invalidateSize();eFit()},150);
+    setTimeout(function(){emap.invalidateSize()},600);
+  }
+    return {init:init,rerender:function(){if(emap){eRender();fillPlaces()}}};
+  }
+  var donorMap=makeMap('em',true);
+  $('em-clear').addEventListener('click',clearSel);
+
+  /* ===== Live truck trackers (demo simulation; swap the timer for the driver's live GPS feed) ===== */
+  window.RS_trk=[];
+  function makeTracker(P,cfg){
+    var map=null,timer=null;
+    function stop(){clearInterval(timer);timer=null}
+    function straight(a,b){var r=[];for(var i=0;i<=40;i++)r.push([a.lat+(b.lat-a.lat)*i/40,a.lng+(b.lng-a.lng)*i/40]);return r}
+    function route(a,b,cb){
+      var fin=false;function fb(){if(fin)return;fin=true;cb(straight(a,b))}
+      var tm=setTimeout(fb,2500);
+      try{fetch('https://router.project-osrm.org/route/v1/driving/'+a.lng+','+a.lat+';'+b.lng+','+b.lat+'?overview=full&geometries=geojson')
+        .then(function(r){return r.json()}).then(function(j){
+          clearTimeout(tm);if(fin)return;fin=true;
+          var c=j.routes&&j.routes[0]&&j.routes[0].geometry.coordinates;
+          if(c&&c.length>1)cb(c.map(function(q){return[q[1],q[0]]}),1);else cb(straight(a,b));
+        }).catch(fb)}catch(e){fb()}
+    }
+    function start(resume){
+      stop();var box=$(P+'-box');if(!box)return;
+      if(P==='dt'){
+        var mine=window.RS_currentDonation;
+        var all=[];try{all=JSON.parse(localStorage.getItem('reserve_donations_v2')||'[]')}catch(e){}
+        var saved=mine?all.find(function(x){return x.id===mine.id}):all.filter(function(x){return x.allocations&&x.allocations.length}).pop();
+        if(!saved||!saved.allocations||!saved.allocations.length){
+          box.innerHTML='<div class="trk"><h3>'+T('⏳ Waiting for NGO selection')+'</h3><p class="trk-sub">'+T('Your donation has been submitted, but no NGO has selected it yet. Truck tracking will appear here only after an NGO chooses your donation.')+'</p></div>';
+          return;
+        }
+      }
+      var c=cfg(),DUR=60,sv=null;
+      try{sv=JSON.parse(localStorage.getItem('rs_trk_'+P)||'null')}catch(e){}
+      if(!(resume&&sv&&sv.t0&&sv.dur===DUR)){sv={t0:Date.now(),truck:c.truck,dur:DUR};try{localStorage.setItem('rs_trk_'+P,JSON.stringify(sv))}catch(e){}}
+      c.truck=sv.truck;
+      box.innerHTML='<div class="trk"><div class="trk-h"><h3>🚚 '+esc(c.title)+'</h3><span class="trk-live"><i></i>'+T('Live (demo)')+'</span></div>'
+        +'<p class="trk-sub">'+esc(c.sub)+'</p>'
+        +'<div class="rqsteps" id="'+P+'-st"><span>'+T('Truck assigned')+'</span><span>'+T('On the way')+'</span><span>'+T('Almost there')+'</span><span>'+T('Arrived')+'</span></div>'
+        +'<div class="trk-stats"><div><b id="'+P+'-eta">—</b><span>'+T('Estimated arrival')+'</span></div><div><b id="'+P+'-dist">—</b><span>'+T('Distance left')+'</span></div><div><b id="'+P+'-stat">'+T('Starting…')+'</b><span>'+T('Status')+'</span></div></div>'
+        +'<div class="trk-map" id="'+P+'-map" role="application" aria-label="'+T('Live map of the food truck')+'"></div>'
+        +'<p class="trk-id">🚚 '+esc(trkText(c.truck))+'</p>'
+        +'<p class="fine">'+T('Prototype: the truck movement is simulated and sped up (about 1 minute, and it keeps running if you leave this page). It will show the real driver location once connected to a GPS feed. Map tiles © Esri / OpenStreetMap contributors.')+'</p></div>';
+      if(typeof L==='undefined'){$(P+'-map').textContent=T('The map could not be loaded.');return}
+      if(map){try{map.remove()}catch(e){}map=null}
+      map=L.map(P+'-map',{zoomControl:false,maxZoom:18}).setView([c.from.lat,c.from.lng],13);
+      var tl=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',{maxZoom:18,attribution:'Tiles &copy; Esri'}).addTo(map),te=0,ok=0,sw=0;
+      tl.on('tileload',function(){ok=1});
+      tl.on('tileerror',function(){if(++te>=4&&!ok&&!sw){sw=1;map.removeLayer(tl);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(map)}});
+      L.control.zoom({position:'bottomright'}).addTo(map);
+      L.marker([c.to.lat,c.to.lng],{icon:pinIcon(c.toColor)}).bindTooltip(c.to.label,{permanent:true,direction:'bottom',offset:[0,6]}).addTo(map);
+      L.circleMarker([c.from.lat,c.from.lng],{radius:8,color:'#fff',weight:3,fillColor:'#f97316',fillOpacity:1}).bindTooltip(c.from.label,{permanent:true,direction:'top'}).addTo(map);
+      setTimeout(function(){if(map)map.invalidateSize()},150);
+      var path,cum,total,dash=null,trail,truck,t0=sv.t0,steps=$(P+'-st').children,TXT=['Truck assigned','On the way','Almost there','Arrived'];
+      function build(np,fit){
+        path=np;cum=[0];
+        for(var i=1;i<path.length;i++)cum.push(cum[i-1]+km({lat:path[i-1][0],lng:path[i-1][1]},{lat:path[i][0],lng:path[i][1]}));
+        total=cum[cum.length-1]||0.01;
+        if(dash)map.removeLayer(dash);
+        dash=L.polyline(path,{color:'#94a3b8',weight:5,dashArray:'8 8',opacity:.8}).addTo(map);
+        if(fit){map.invalidateSize();map.fitBounds(path,{padding:[50,50]})}
+      }
+      function tick(){
+        if(!$(P+'-map')||!map){stop();return}
+        var p=Math.min(1,(Date.now()-t0)/1000/DUR),d=p*total,i=1;
+        while(i<cum.length-1&&cum[i]<d)i++;
+        var f=Math.min(1,Math.max(0,(d-cum[i-1])/((cum[i]-cum[i-1])||1e-9))),a=path[i-1],b=path[i],pos=[a[0]+(b[0]-a[0])*f,a[1]+(b[1]-a[1])*f];
+        truck.setLatLng(pos);trail.setLatLngs(path.slice(0,i).concat([pos]));
+        var left=total-d,st=p>=1?3:(left<0.6||p>.85)?2:p>.02?1:0;
+        $(P+'-eta').textContent=p>=1?T('Arrived'):Math.max(1,Math.ceil(DUR*(1-p)/60))+' '+T('min');
+        $(P+'-dist').textContent=p>=1?'0 '+T('km'):left.toFixed(1)+' '+T('km');
+        $(P+'-stat').textContent=T(TXT[st]);
+        for(var k=0;k<4;k++)steps[k].className=k<st?'done':k===st?'on':'';
+        if(p>=1){steps[3].className='done';stop()}
+      }
+      var line0=straight(c.from,c.to);
+      build(line0,true);
+      trail=L.polyline([line0[0]],{color:'#059669',weight:6}).addTo(map);
+      truck=L.marker(line0[0],{icon:L.divIcon({className:'',html:'<div class="trkTruck">🚚</div>',iconSize:[44,44],iconAnchor:[22,22]}),zIndexOffset:900}).addTo(map);
+      timer=setInterval(tick,100);tick();
+      /* swap in the real road route as soon as it loads; the truck keeps its progress */
+      route(c.from,c.to,function(np,real){if(real&&map&&$(P+'-map'))build(np,true)});
+    }
+    function reset(){stop();try{localStorage.removeItem('rs_trk_'+P)}catch(e){}}
+    var t={start:start,stop:stop,reset:reset};window.RS_trk.push(t);return t;
+  }
+  function trkInfo(){return{no:'TN 38 BK '+(1000+Math.floor(Math.random()*8999)),d:Math.floor(Math.random()*3)}}
+  function trkText(x){if(typeof x==='string')return x;var n=['Murugan K.','Selvam R.','Anitha P.'];return TF('Truck {0} · Driver: {1} (sample)',[x.no,T(n[x.d])])}
+  /* Donor sees the truck coming to collect the food from them */
+  var dTrk=makeTracker('dt',function(){
+    var me=window.RS_donorLoc||{lat:11.007,lng:76.95},ngo=nearestNgo(me),from={lat:ngo.lat,lng:ngo.lng};
+    if(km(me,ngo)>40)from={lat:me.lat+0.03,lng:me.lng-0.03}; /* demo: put the truck nearby if the NGO sample data is far away */
+    var addr=($('d-addr').value||'').trim().replace(/\s+/g,' ').slice(0,90);
+    return{title:T('Track your pickup truck'),sub:addr?TF('A ReServe truck is on its way to collect your food from {0}.',[addr]):T('A ReServe truck is on its way to collect your food.'),truck:trkInfo(),
+      from:{lat:from.lat,lng:from.lng,label:T('Truck starts here')},to:{lat:me.lat,lng:me.lng,label:T('Your pickup point')},toColor:'#2eaa5c'};
+  });
+  /* NGO sees the truck bringing the donated food to them */
+  function ngoCfg(){
+    var home=EM.filter(function(x){return x.id===9})[0],don=EM.filter(function(x){return x.id===6})[0],src=window.RS_donorLoc;
+    if(!src||km(src,home)>40)src={lat:don.lat,lng:don.lng};
+    var nm=window.RS_ngoName||T('your organization'),q=window.RS_lastDonation,al=window.RS_alloc;
+    var what=q?(q.q+' '+T(q.unit)):T('sample donation: 150 meals'),chosen=window.RS_selectedDonor;
+    var note=al?' '+(al.surplus>0?TF('The extra {0} {1} remains available for another eligible NGO.',[al.surplus,T(al.unit)]):T('The donation quantity has been fully allocated.')):'';
+    var sub=chosen?TF('A ReServe truck has been dispatched and is bringing {0} from {1} to {2}. The route shown is a prototype simulation.',[what,chosen.name,nm]):TF('A ReServe truck has been dispatched and is bringing {0} to {1}. The route shown is a prototype simulation.',[what,nm]);
+    return{title:T('Incoming food truck'),sub:sub+note,truck:trkInfo(),
+      from:{lat:src.lat,lng:src.lng,label:T('Donor pickup point')},to:{lat:home.lat,lng:home.lng,label:nm},toColor:'#1e6fd9'};
+  }
+  var nTrk=makeTracker('nt',ngoCfg),rTrk=makeTracker('nr',ngoCfg);
+
+  /* NGO form */
+  var fn=$('f-ngo'),advN;
+  /* registration certificate: PDF / JPG / PNG, up to 5 MB */
+  var certIn=$('n-cert'),certDrop=$('n-drop'),certName=$('n-fname'),certErr=$('n-certErr');
+  function certCheck(show){
+    var f=certIn.files[0],msg='';
+    if(!f)msg='Upload your registration certificate.';
+    else if(!/\.(pdf|jpe?g|png)$/i.test(f.name)||(f.type&&!/^(application\/pdf|image\/(jpeg|png))$/.test(f.type)))msg='Upload a PDF, JPG or PNG file.';
+    else if(f.size>5*1024*1024)msg='The file is larger than 5 MB. Please choose a smaller one.';
+    bad($('n-cert-f'),!!msg&&show);
+    if(msg&&show)dyn(certErr,function(){return T(msg)});else undyn(certErr);
+    return !!msg;
+  }
+  function certShow(){
+    var f=certIn.files[0];
+    if(f&&certCheck(true)){certIn.value='';f=null}
+    else if(f)certCheck(false);
+    certName.textContent=f?f.name+' ('+Math.max(1,Math.round(f.size/1024))+' KB)':'';
+  }
+  certIn.addEventListener('change',certShow);
+  ['dragenter','dragover'].forEach(function(t){certDrop.addEventListener(t,function(e){e.preventDefault();certDrop.classList.add('over')})});
+  ['dragleave','drop'].forEach(function(t){certDrop.addEventListener(t,function(e){e.preventDefault();certDrop.classList.remove('over')})});
+  certDrop.addEventListener('drop',function(e){
+    var fl=e.dataTransfer&&e.dataTransfer.files;
+    if(fl&&fl.length){try{certIn.files=fl}catch(x){return}certShow()}
+  });
+  fn.addEventListener('reset',function(){certName.textContent='';undyn(certErr);$('n-cert-f').classList.remove('invalid');$('n-regtype-f').classList.remove('invalid')});
+  fn.addEventListener('submit',function(e){
+    e.preventDefault();
+    var first=basic(fn),rt=$('n-regtype');
+    if(bad($('n-regtype-f'),rt.value===''))first=first||rt;
+    if(certCheck(true)&&!first)first=$('n-cert');
+    if(!done(first))return;
+    window.RS_ngoName=$('n-name').value.trim();
+    var cf=$('n-cert').files[0],cat=fn.querySelector('input[name="n-cat"]:checked');
+    window.RS_ngoProfile={name:$('n-name').value.trim(),address:$('n-addr').value.trim(),city:$('n-city').value.trim(),phone:$('n-phone').value.trim(),email:$('n-email')?$('n-email').value.trim():'',
+      category:cat?cat.value:'',regType:rt.value,regNumber:$('n-regno').value.trim(),issuingAuthority:$('n-auth').value.trim(),
+      certificate:cf?{name:cf.name,type:cf.type,size:cf.size}:null};
+    try{localStorage.setItem('reserve_ngo_profile_v2',JSON.stringify(window.RS_ngoProfile))}catch(e){}
+    fn.hidden=true;$('ok-ngo').hidden=false;fn.reset();
+  });
+  fn.addEventListener('input',function(e){var g=e.target.closest('.field');if(g)g.classList.remove('invalid')});
+
+  /* NGO requirement details: four steps with live summary */
+  var LISTS={
+    ages:['Children (0-12 years)','Teenagers (13-17 years)','Adults (18-59 years)','Senior Citizens (60+ years)','Mixed Community'],
+    foods:['Vegetarian','Non-Vegetarian','Sweets','Bakery Items','Fruits','Snacks','Beverages','Cooked Meals','Packaged Food','Others'],
+    allergy:['Nuts','Dairy','Gluten','Eggs','Soy','Seafood','Sesame'],
+    pack:['Individually Packed','Bulk Containers','Either Option']
+  };
+  var R={ages:[],foods:[],allergy:[],pack:[],cold:'',urg:'',dist:{}},rqI=0,rqTried=false,rqT={};
+  function fillSel(id,ph,items){
+    var el=$(id);
+    function draw(){var cur=el.value;el.innerHTML='<option value="">'+T(ph)+'</option>'+items.map(function(t){return'<option value="'+t+'">'+T(t)+'</option>'}).join('');el.value=cur}
+    draw();onLang(draw);
+  }
+  fillSel('rq-dur','Select duration',['Today Only','1 Week','2 Weeks','1 Month','Ongoing Requirement']);
+  fillSel('rq-prep','Select a time limit',['Within 2 hours','Within 4 hours','Within 6 hours','Within 8 hours','Within 12 hours','Within 24 hours']);
+  fillSel('rq-dry','Select capacity',['Less than 50 meals','50–100 meals','100–250 meals','250+ meals']);
+  function grp(box,key,items,type,ex){
+    var el=$(box);
+    function draw(){
+      var cur=R[key];
+      el.innerHTML=items.map(function(t){var on=type==='radio'?cur===t:(cur||[]).indexOf(t)>-1;return'<label class="chip"><input type="'+type+'" name="rq-'+key+'" value="'+t+'"'+(on?' checked':'')+'><span>'+T(t)+'</span></label>'}).join('');
+    }
+    draw();onLang(draw);
+    el.addEventListener('change',function(e){
+      var ins=[].slice.call(el.querySelectorAll('input')),v=e.target.value;
+      if(type==='radio'){R[key]=v}else{
+        var c=ins.filter(function(i){return i.checked}).map(function(i){return i.value});
+        if(ex)c=(v===ex&&e.target.checked)?[ex]:c.filter(function(x){return x!==ex});
+        ins.forEach(function(i){i.checked=c.indexOf(i.value)>-1});R[key]=c;
+      }
+      rqT[key]=1;rqRefresh();
+    });
+  }
+  grp('g-ages','ages',LISTS.ages,'checkbox');grp('rq-g-foods','foods',LISTS.foods,'checkbox');
+  grp('g-allergy','allergy',LISTS.allergy,'checkbox');
+  grp('g-pack','pack',LISTS.pack,'checkbox','Either Option');grp('g-cold','cold',['Yes','No','Limited'],'radio');
+  var URG=[['Low','🟢','Current supplies available.'],['Medium','🟡','May require donations soon.'],['High','🟠','Need additional food within a few days.'],['Emergency','🔴','Immediate food assistance required.']];
+  function drawUrg(){$('g-urg').innerHTML=URG.map(function(u){return'<label class="urgc '+u[0].toLowerCase()+'"><input type="radio" name="rq-urg" value="'+u[0]+'"'+(R.urg===u[0]?' checked':'')+'><span><b>'+u[1]+' '+T(u[0])+'</b><small>'+T(u[2])+'</small></span></label>'}).join('')}
+  drawUrg();onLang(drawUrg);
+  $('g-urg').addEventListener('change',function(e){R.urg=e.target.value;rqT.urg=1;rqRefresh()});
+
+  function v(id){return $(id).value.trim()}
+  function rqErr(){
+    var e={},d=[v('rq-dc'),v('rq-dt'),v('rq-da'),v('rq-ds')],sum=d.reduce(function(a,b){return a+(parseFloat(b)||0)},0);
+    if(!(parseInt(v('rq-ppl'),10)>0))e.ppl=1;
+    if(!(parseInt(v('rq-meals'),10)>0))e.meals=1;
+    if(!v('rq-dur'))e.dur=1;
+    if(!R.ages.length)e.ages=1;
+    if(!R.foods.length)e.foods=1;
+    if(!R.urg)e.urg=1;
+    if(d.some(function(x){return x!==''})&&Math.round(sum)!==100)e.dist={sum:Math.round(sum)};
+    return e;
+  }
+  var RQK=[['ppl','meals','dur','ages','dist'],['foods'],[],['urg']];
+  function rqPct(){
+    var n=[v('rq-ppl'),v('rq-meals'),v('rq-dur'),R.ages.length,R.foods.length,R.allergy.length||v('rq-notes'),R.pack.length,R.cold,v('rq-dry'),R.urg].filter(Boolean).length;
+    return Math.round(n/11*100);
+  }
+  function rqRefresh(){
+    var e=rqErr();
+    ['ppl','meals','dur','ages','foods','urg','dist'].forEach(function(k){
+      var g=$('q-'+k),on=e[k]&&(rqTried||rqT[k]);g.classList.toggle('invalid',!!on);
+      if(k==='dist'&&e[k]&&e[k].sum!==undefined){var de=e[k];dyn(g.querySelector('.err'),function(){return TF('Your percentages add up to {0}%. They should total 100%.',[de.sum])})}
+    });
+    $('rs-ppl').textContent=v('rq-ppl')||'—';
+    $('rs-meals').textContent=v('rq-meals')?TF('{0} {1} per day',[v('rq-meals'),T($('rq-unit').value)]):'—';
+    $('rs-foods').textContent=R.foods.map(T).join(', ')||'—';
+    $('rs-ages').textContent=R.ages.map(function(a){return T(a.split(' (')[0])}).join(', ')||'—';
+    $('rs-allergy').textContent=R.allergy.map(T).join(', ')||'—';
+    $('rs-urg').textContent=R.urg?URG.filter(function(u){return u[0]===R.urg})[0][1]+' '+T(R.urg):'—';
+  }
+  function rqGo(i){
+    rqI=i;
+    document.querySelectorAll('#f-req .rqpane').forEach(function(p){p.classList.toggle('on',+p.getAttribute('data-s')===i)});
+    document.querySelectorAll('#rq-steps span').forEach(function(sp,n){sp.className=n<i?'done':n===i?'on':''});
+    $('rq-back').style.visibility=i?'visible':'hidden';
+    $('rq-next').textContent=T(i<3?'Next →':'Save Requirements & Start Receiving Donations');
+    rqRefresh();
+  }
+  function rqOpen(){$('f-req').hidden=false;$('ok-req').hidden=true;$('rq-note').textContent='';rqTried=false;rqGo(0)}
+  $('rq-next').addEventListener('click',function(){
+    var e=rqErr(),bad=RQK[rqI].filter(function(k){return e[k]});
+    if(bad.length){rqTried=true;rqRefresh();$('q-'+bad[0]).scrollIntoView({behavior:'smooth',block:'center'});return}
+    rqTried=false;
+    if(rqI<3){rqGo(rqI+1);window.scrollTo({top:0,behavior:'smooth'});return}
+    $('f-req').hidden=true;$('ok-req').hidden=false;window.scrollTo({top:0,behavior:'smooth'});rTrk.reset();
+    window.RS_ngoRequirements={
+      ngo:window.RS_ngoProfile||{name:window.RS_ngoName||'Registered NGO'},
+      dailyQuantity:parseFloat(v('rq-meals'))||0,unit:$('rq-unit').value,duration:v('rq-dur'),
+      people:parseInt(v('rq-ppl'),10)||0,foods:R.foods.slice(),allergens:R.allergy.slice(),
+      allergyNotes:v('rq-notes'),packaging:R.pack.slice(),coldStorage:R.cold,
+      preferredPrepTime:v('rq-prep'),dryCapacity:v('rq-dry'),urgency:R.urg,emergency:!!$('rq-em').checked,
+      savedAt:new Date().toISOString()
+    };
+    try{localStorage.setItem('reserve_ngo_requirements_v2',JSON.stringify(window.RS_ngoRequirements))}catch(e){}
+    renderMatches();
+  });
+  $('rq-back').addEventListener('click',function(){rqGo(rqI-1);window.scrollTo({top:0,behavior:'smooth'})});
+  $('f-req').addEventListener('submit',function(e){e.preventDefault();$('rq-next').click()});
+  $('f-req').addEventListener('input',rqRefresh);
+  $('f-req').addEventListener('focusout',function(e){if(e.target.id)rqT[e.target.id.replace('rq-','')]=1;rqRefresh()});
+  $('rq-upd').addEventListener('click',function(){rqOpen();window.scrollTo({top:0,behavior:'smooth'})});
+
+  /* ===== Public read-only available donations board ===== */
+  function renderPublicDonations(){
+    var list=$('public-list'),summary=$('public-summary');
+    if(!list||!summary)return;
+    var available=readDonations().filter(function(d){return Number(d.remaining)>0 && d.status!=='Allocated'});
+    available.sort(function(a,b){return String(b.createdAt||'').localeCompare(String(a.createdAt||''))});
+    summary.textContent=TF(available.length===1?'{0} currently available donation centre. This board is view-only.':'{0} currently available donation centres. This board is view-only.',[available.length]);
+    if(!available.length){
+      list.innerHTML='<div class="match-empty"><h3>'+T('No available donations right now')+'</h3><p>'+T('New donations will appear here automatically after a donor submits them. Fully allocated donations disappear from this board.')+'</p></div>';
+      return;
+    }
+    list.innerHTML=available.map(function(d){
+      var status=T(d.status==='Partially allocated'?'Partially allocated · balance available':'Available');
+      return '<article class="match-card"><span class="tagline">'+esc(status)+'</span><h3>'+esc(d.name||T('Donation centre'))+'</h3>'+
+        '<p><b>'+T('Food:')+'</b> '+esc((d.foods||[]).map(T).join(', ')||T('Not specified'))+'</p>'+
+        '<p><b>'+T('Allergens present:')+'</b> '+esc((d.allergens||[]).map(T).join(', ')||T('None declared'))+'</p>'+
+        '<p class="match-qty">'+TF('{0} {1} available',[Number(d.remaining),esc(T(d.unit||''))])+'</p>'+
+        '<p><b>'+T('Pickup area:')+'</b> '+esc((d.address||'').split(',').slice(-2).join(', ').trim()||T('Area not specified'))+'</p>'+
+        '<p class="fine">'+T('Last listed:')+' '+esc(d.createdAt?new Date(d.createdAt).toLocaleString(LANG==='ta'?'ta-IN':undefined):T('Recently'))+'</p></article>';
+    }).join('');
+  }
+  window.addEventListener('storage',function(e){
+    if(e.key==='reserve_donations_v2'||e.key===null){
+      renderPublicDonations();
+      if($('v-match').classList.contains('on'))renderMatches();
+    }
+  });
+  /* Same-tab changes are rendered directly; this timer also keeps the public board fresh. */
+  setInterval(function(){
+    if($('v-public').classList.contains('on'))renderPublicDonations();
+  },2000);
+
+  /* ===== Saved donor / NGO matching ===== */
+  function readDonations(){try{return JSON.parse(localStorage.getItem('reserve_donations_v2')||'[]')}catch(e){return[]}}
+  function saveDonations(list){try{localStorage.setItem('reserve_donations_v2',JSON.stringify(list))}catch(e){}}
+  function durationDays(label){
+    return {'Today Only':1,'1 Week':7,'2 Weeks':14,'1 Month':30,'Ongoing Requirement':1}[label]||1;
+  }
+  function currentRequirements(){
+    if(window.RS_ngoRequirements)return window.RS_ngoRequirements;
+    try{return JSON.parse(localStorage.getItem('reserve_ngo_requirements_v2')||'null')}catch(e){return null}
+  }
+  function currentNGO(){
+    if(window.RS_ngoProfile)return window.RS_ngoProfile;
+    try{return JSON.parse(localStorage.getItem('reserve_ngo_profile_v2')||'null')}catch(e){return null}
+  }
+  function requiredTotal(req){return (Number(req.dailyQuantity)||0)*durationDays(req.duration)}
+  function matchReason(d,req){
+    if(!d||!(Number(d.remaining)>0))return false;
+    if(d.unit!==req.unit)return false;
+    if(Number(d.remaining)<requiredTotal(req))return false;
+    if(!d.foods||!d.foods.some(function(f){return req.foods.indexOf(f)>-1}))return false;
+    var restricted=(req.allergens||[]).concat((req.allergyNotes||'').toLowerCase().split(/[,;\n]+/).map(function(x){return x.trim()}).filter(Boolean));
+    var hasAllergen=(d.allergens||[]).some(function(a){return restricted.some(function(r){return r.toLowerCase()===a.toLowerCase()})});
+    var ngoName=(req.ngo&&req.ngo.name||'').toLowerCase();
+    if(ngoName&&(d.allocations||[]).some(function(a){return (a.ngo||'').toLowerCase()===ngoName}))return false;
+    if(hasAllergen)return false;
+    if(req.ngo&&req.ngo.name&&d.target&&d.target.toLowerCase()!==req.ngo.name.toLowerCase())return false;
+    return true;
+  }
+  function renderMatches(){
+    var req=currentRequirements(),list=$('match-list'),summary=$('match-summary');
+    if(!req||!list||!summary)return;
+    var required=requiredTotal(req),days=durationDays(req.duration),donations=readDonations();
+    var eligible=donations.filter(function(d){return matchReason(d,req)}).sort(function(a,b){return Number(b.remaining)-Number(a.remaining)});
+    summary.textContent=TF('NGO: {0} · Required: {1} {2} ({3} {2}/day × {4} {5}). {6} {7} found.',[(req.ngo&&req.ngo.name)||T('Your organization'),required,T(req.unit),req.dailyQuantity,days,T(days===1?'day':'days'),eligible.length,T(eligible.length===1?'matching donor':'matching donors')]);
+    if(!eligible.length){
+      list.innerHTML='<div class="match-empty"><h3>'+T('No matching donations available yet')+'</h3><p>'+T('A donation is shown only if its remaining quantity meets your total requirement, its unit matches (meals with meals or kg with kg), its food category is accepted, and it contains NONE of the allergens your NGO selected to avoid.')+'</p><p><b>'+T('Important allergen rule:')+'</b> '+T('if the donor selects Nuts because the food contains nuts, and the NGO selects Nuts because it must avoid nuts, that donation is intentionally excluded for safety.')+'</p><p>'+T('Donations saved in this browser can be checked again when more donation centres register here.')+'</p></div>';
+      return;
+    }
+    list.innerHTML=eligible.map(function(d){
+      return '<article class="match-card"><span class="tagline">'+T('Eligible donation')+'</span><h3>'+esc(d.name)+'</h3>'+
+        '<p><b>'+T('Food:')+'</b> '+esc((d.foods||[]).map(T).join(', '))+'</p>'+
+        '<p><b>'+T('Allergens declared:')+'</b> '+esc((d.allergens||[]).map(T).join(', ')||T('None declared'))+'</p>'+
+        '<p class="match-qty">'+TF('{0} {1} available',[Number(d.remaining),esc(T(d.unit))])+'</p>'+
+        '<p><b>'+T('Your allocation:')+'</b> '+required+' '+esc(T(req.unit))+'</p>'+
+        '<p><b>'+T('Pickup:')+'</b> '+esc(d.address||T('Not provided'))+'</p>'+
+        '<p class="match-contact"><b>'+T('Contact:')+'</b> '+esc(d.phone||T('Not provided'))+'</p>'+
+        '<button type="button" class="go match-follow" data-donor="'+esc(d.id)+'">'+T('Choose this donation & dispatch truck')+'</button></article>';
+    }).join('');
+  }
+  $('match-list').addEventListener('click',function(e){
+    var btn=e.target.closest('[data-donor]');if(!btn)return;
+    var req=currentRequirements();if(!req)return;
+    var donations=readDonations(),d=donations.find(function(x){return x.id===btn.getAttribute('data-donor')});
+    if(!d||!matchReason(d,req)){renderMatches();return}
+    var allocation=requiredTotal(req),surplus=Math.max(0,Number(d.remaining)-allocation);
+    d.remaining=Number(d.remaining)-allocation;d.status=d.remaining>0?'Partially allocated':'Allocated';
+    d.allocations=d.allocations||[];
+    var ehome=EM.filter(function(x){return x.id===9})[0],edon=EM.filter(function(x){return x.id===6})[0],esrc=window.RS_donorLoc;
+    if(!esrc||km(esrc,ehome)>40)esrc={lat:edon.lat,lng:edon.lng};
+    var etaMin=Math.max(10,Math.round(km(esrc,ehome)/25*60)+10);
+    d.allocations.push({ngo:(req.ngo&&req.ngo.name)||'NGO',quantity:allocation,unit:req.unit,at:new Date().toISOString(),etaMin:etaMin,etaAt:new Date(Date.now()+etaMin*60000).toISOString(),seen:false});
+    /* start one shared truck for donor and NGO so both trackers show the same trip */
+    var sv0=JSON.stringify({t0:Date.now(),truck:trkInfo(),dur:60});
+    try{localStorage.setItem('rs_trk_dt',sv0);localStorage.setItem('rs_trk_nr',sv0)}catch(e){}
+    saveDonations(donations);
+    renderPublicDonations();updateDonorBadge();
+    window.RS_lastDonation={q:allocation,unit:req.unit};
+    window.RS_selectedDonor=d;
+    window.RS_alloc={surplus:surplus,unit:req.unit};
+    renderMatches();
+    /* Selecting an eligible donation dispatches the demo truck immediately. */
+    $('surplus-modal').hidden=true;
+    show('v-ntrack');
+  });
+
+  /* ===== Donor notifications: an NGO ordered this donor's food ===== */
+  var dnShown=0;
+  function donorOrders(all){
+    var cur=window.RS_currentDonation,list=[];
+    all.forEach(function(d){
+      if(cur&&d.id!==cur.id)return;
+      (d.allocations||[]).forEach(function(a){list.push({d:d,a:a})});
+    });
+    return list.sort(function(x,y){return new Date(y.a.at)-new Date(x.a.at)});
+  }
+  function updateDonorBadge(){
+    var n=donorOrders(readDonations()).filter(function(o){return !o.a.seen}).length;
+    document.querySelectorAll('.ndot').forEach(function(el){el.hidden=!n});
+  }
+  function renderDonorNotes(){
+    var all=readDonations(),orders=donorOrders(all),ch=false;
+    var items=orders.map(function(o){var nw=!o.a.seen;if(nw){o.a.seen=true;ch=true}
+      return{ngo:o.a.ngo,q:o.a.quantity,u:o.a.unit,at:o.a.at,eta:o.a.etaAt,m:o.a.etaMin,nw:nw}});
+    if(ch)saveDonations(all);
+    dnShown=items.length;
+    function tm(iso){return iso?new Date(iso).toLocaleTimeString(LANG==='ta'?'ta-IN':undefined,{hour:'numeric',minute:'2-digit'}):''}
+    dyn($('dt-notes'),function(){
+      if(!items.length)return '';
+      return '<h3 class="nt-h">🔔 '+T('Notifications')+'</h3>'+items.map(function(i){
+        return '<article class="nt-card"><div class="nt-top"><b>✅ '+T('Order placed')+'</b>'+(i.nw?'<span class="nt-new">'+T('New')+'</span>':'')+'</div>'
+          +'<p>'+TF('{0} has placed an order for your donation.',[esc(i.ngo)])+'</p>'
+          +'<p><b>'+T('Quantity ordered:')+'</b> '+Number(i.q)+' '+esc(T(i.u))+'</p>'
+          +(i.eta?'<p><b>'+T('Estimated arrival')+':</b> '+tm(i.eta)+' ('+TF('about {0} min',[i.m])+')</p>':'')
+          +'<p class="fine" style="margin:.3rem 0 0">'+T('Ordered at:')+' '+tm(i.at)+' · '+T('Live tracking for this order is shown below.')+'</p></article>';
+      }).join('');
+    },true);
+    updateDonorBadge();
+  }
+  window.addEventListener('storage',function(e){if(e.key==='reserve_donations_v2'||e.key===null)updateDonorBadge()});
+  setInterval(function(){
+    updateDonorBadge();
+    if($('v-dtrack').classList.contains('on')&&donorOrders(readDonations()).length>dnShown){renderDonorNotes();dTrk.start(true)}
+  },2000);
+  updateDonorBadge();
+  $('surplus-close').addEventListener('click',function(){$('surplus-modal').hidden=true});
+  $('surplus-track').addEventListener('click',function(){$('surplus-modal').hidden=true;show('v-ntrack')});
+  document.getElementById('surplus-modal').addEventListener('click',function(e){if(e.target.id==='surplus-modal')e.currentTarget.hidden=true});
+
+  /* Site-wide progress bar */
+  function phone(id){var d=$(id).value.replace(/\D/g,'');return d.length>=7&&d.length<=15}
+  function filled(id){return $(id).value.trim()!==''}
+  function updateProgress(){
+    var cur=document.querySelector('.view.on'),id=cur?cur.id:'v-home',label='Start here: choose Food Donator or Charity / NGO',p=0;
+    if(id==='v-verify'){
+      label='Donor · Step 1 of 2: Verification';
+      p=$('vSuccess').hidden?([/^\d{14}$/.test($('fssai').value.trim()),$('idType').value!=='',$('agree').checked].filter(Boolean).length/3)*40+10:50;
+      if(!$('vSuccess').hidden)label='Donor · Verification submitted';
+    }else if(id==='v-donor'){
+      label='Donor · Step 2 of 2: Donation details';
+      if(!$('ok-donor').hidden){p=100;label='Donor · All done, thank you'}
+      else p=50+([filled('d-name'),filled('d-addr'),phone('d-phone'),fd.querySelectorAll('input[name=food]:checked').length>0,!!fd.querySelector('input[name=consent]:checked')].filter(Boolean).length/5)*50;
+    }else if(id==='v-ngo'){
+      label='Charity · Step 1 of 2: Registration';
+      if(!$('ok-ngo').hidden){p=50;label='Charity · Registered'}
+      else p=([filled('n-name'),filled('n-addr'),filled('n-city'),phone('n-phone')].filter(Boolean).length/4)*40+10;
+    }else if(id==='v-dtrack'){label='Donor · Live truck tracker';p=100;}else if(id==='v-ntrack'){label='Charity · Live truck tracker';p=100;
+    }else if(id==='v-ngoreq'){
+      label='Charity · Step 2 of 2: Requirement details';
+      if(!$('ok-req').hidden){p=100;label='Charity · All done, thank you'}else p=50+rqPct()/2;
+    }
+    p=Math.round(p);
+    $('gl').textContent=T(label);$('gpct').textContent=p+'%';$('gfill').style.width=p+'%';
+    $('gprog').setAttribute('aria-valuenow',p);$('gprog').classList.toggle('half',p>=50);
+  }
+  ['input','change','click','submit'].forEach(function(ev){document.addEventListener(ev,function(){setTimeout(updateProgress,0)})});
+  /* ===== Language: ask first, then switch the whole site ===== */
+  onLang(updateProgress);onLang(calc);onLang(renderPublicDonations);onLang(renderMatches);
+  onLang(function(){donorMap.rerender()});
+  onLang(function(){rqGo(rqI)});
+  onLang(function(){
+    if($('v-dtrack').classList.contains('on'))dTrk.start(true);
+    if($('v-ntrack').classList.contains('on'))rTrk.start(true);
+  });
+  var gate=$('langgate'),shell=[].slice.call(document.querySelectorAll('.splash,header.top,.gprog,main,footer'));
+  shell.forEach(function(n){n.inert=true});
+  function closeGate(){
+    shell.forEach(function(n){n.inert=false});
+    gate.classList.add('gone');startSplash();
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-lang],[data-pick]');if(!b)return;
+    setLang(b.getAttribute('data-lang')||b.getAttribute('data-pick'));
+    if(b.hasAttribute('data-pick'))closeGate();
+  });
+  setLang('en');
+  var firstPick=gate.querySelector('[data-pick]');if(firstPick)firstPick.focus();
+  updateProgress();
+})();
+</script>
+</body>
+</html>
